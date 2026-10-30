@@ -1,0 +1,17 @@
+name: Warm EasyFolio API cache
+on:
+  schedule:
+    - cron: "45 15 * * 1-6"
+  workflow_dispatch:
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Refresh running API process
+        env:
+          API_BASE_URL: ${{ secrets.EASYFOLIO_API_BASE_URL }}
+          REFRESH_TOKEN: ${{ secrets.EASYFOLIO_REFRESH_TOKEN }}
+        run: |
+          test -n "$API_BASE_URL"
+          test -n "$REFRESH_TOKEN"
+          curl --fail --silent --show-error -X POST "$API_BASE_URL/api/v1/internal/refresh" -H "X-Refresh-Token: $REFRESH_TOKEN"
