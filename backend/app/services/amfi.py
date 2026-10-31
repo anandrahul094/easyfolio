@@ -58,7 +58,7 @@ def parse_nav_date(value: str):
 
 def normalize_text(value: str) -> str:
     """Trim feed text and collapse runs of whitespace into one readable space."""
-    return re.sub(r"\\s+", " ", value).strip()
+    return re.sub(r"\s+", " ", value).strip()
 
 
 def parse_category_header(line: str):
