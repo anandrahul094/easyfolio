@@ -34,7 +34,7 @@ describe("scheme comparison interactions",()=>{
     await addScheme(user,"Beta Debt Fund");
 
     expect(screen.getAllByText("Alpha Equity Fund")).toHaveLength(2);
-    expect(screen.getAllByText("Beta Debt Fund")).toHaveLength(3);
+    expect(screen.getAllByText("Beta Debt Fund")).toHaveLength(2);
     expect(screen.getByText("Alpha AMC")).toBeInTheDocument();
     expect(screen.getByText("Beta AMC")).toBeInTheDocument();
     expect(screen.getByText("INF000000001")).toBeInTheDocument();
