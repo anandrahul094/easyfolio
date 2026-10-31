@@ -1,4 +1,4 @@
-name: Frontend build
+name: Frontend build and tests
 on: [push, pull_request]
 jobs:
   build:
@@ -12,4 +12,5 @@ jobs:
         with:
           node-version: "20"
       - run: npm install
+      - run: npm test -- --passWithNoTests --runInBand
       - run: npm run build
