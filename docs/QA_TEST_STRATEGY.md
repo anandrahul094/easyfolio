@@ -8,76 +8,52 @@ Every feature follows Red → Green → Refactor:
 3. Refactor: remove duplication and improve structure while keeping the suite green.
 4. Run the complete backend suite, frontend suite and production build before merging.
 
-The AMFI parser contract tests completed their Red–Green cycle. The backend suite now covers parser behaviour, AMFI fetch failures, cache refresh/retention and API endpoints.
+## Frameworks and CI
 
-## Frameworks
-
-- Backend: PyTest, pytest-cov, FastAPI TestClient (HTTPX), and deterministic mocks/fakes.
+- Backend: PyTest, pytest-cov, FastAPI TestClient (HTTPX), deterministic fixtures and mocks.
 - Frontend: Jest, next/jest, React Testing Library, user-event, jsdom and jest-dom.
-- CI: backend tests + coverage and frontend tests + Next.js production build run independently.
+- CI runs backend unit tests, backend integration tests, a full backend suite with an 85% coverage gate, frontend Jest with coverage thresholds, and the Next.js production build.
 
-## Test layout
+## Backend coverage
 
-    backend/
-      app/services/amfi.py
-      app/services/catalog.py
-      app/repositories/
-      tests/
-        conftest.py
-        fixtures/
-        unit/
-          test_amfi_parser_contract.py
-          test_amfi_fetch.py
-        integration/
-          test_catalog_service.py
-          test_api.py
-        test_parser.py
-      pytest.ini
-      requirements-dev.txt
-    frontend/
-      app/lib/finance.ts
-      app/compare/scheme-picker.tsx
-      __tests__/
-        finance.test.ts
-        compare.test.tsx
-      jest.config.js
-      jest.setup.ts
-      package.json
+- AMFI parser: legacy/current formats, Direct/Growth filtering, category mapping, AMC attribution, whitespace normalisation, NAV precision and complete Fund-field preservation.
+- AMFI fetch client: SHA-256 digest, timeout, connection, HTTP, empty response and HTML response handling.
+- Catalog service: refresh and snapshot replacement, cache hit, expiry/refresh path, upstream failure, stale-data retention and invalid-feed protection.
+- FastAPI: health/status, search, category filters, pagination, detail, 404, validation, token-protected refresh and 503/502 error mapping.
 
-## Current automated coverage
+## Frontend screen and interaction coverage
 
-### Backend unit tests
-- Legacy and current AMFI feed formats, Direct/Growth filtering, category grouping, AMC attribution, whitespace normalisation, NAV decimal precision and complete Fund field preservation.
-- AMFI HTTP client: success/digest, timeout, connection failure, HTTP error, empty response and HTML response rejection.
+- Homepage and navigation links.
+- Learning centre and individual lessons, including lesson order, metadata and previous/next links.
+- Investing basics, category routes, resources and About disclosures.
+- Fund Explorer: API success, search, category filter, clear filters, pagination, empty/error states, source date and future NAV warnings.
+- Fund detail: scheme identity, NAV/date, source disclosure, missing-metric notice, comparison link, invalid identifier, 404 and upstream error.
+- Guided discovery: answer requirement, selected state, progress, back/continue, answer editing, result summary and reset.
+- Glossary: case-insensitive search, definition matching and empty-state feedback.
+- SIP and compound calculators: interactive controls and displayed results, backed by pure, tested financial functions.
+- Comparison: add/remove selection, duplicate prevention, three-scheme maximum and rendered comparison metrics.
+- Frontend coverage gate: statements ≥90%, lines ≥90%, functions ≥80%, branches ≥75%.
 
-### Backend integration tests
-- Catalog refresh parses AMFI data and replaces the cached snapshot.
-- Cache hits avoid repeat network requests until expiry.
-- Upstream failures retain the last good snapshot and expose a stale status; a first-load failure raises instead of returning empty success.
-- FastAPI TestClient covers health, search, category filtering, pagination, scheme detail, 404, query validation and authenticated manual refresh.
+## Features not implemented
 
-### Frontend tests
-- INR whole-rupee formatting and invalid-number rejection.
-- SIP end-of-month monthly-compounding formula, zero-rate result, negative assumptions and invalid inputs.
-- Compound-interest frequency, negative assumptions and validation.
-- Scheme comparison selection, removal, duplicate prevention, three-scheme limit and rendering of the comparison facts.
-
-## Product features that are not present and therefore not testable yet
-
-- **Risk classification:** No risk-scoring or Riskometer mapping implementation currently exists. The AMFI NAV feed alone is insufficient to calculate Low/Medium/High risk. Do not infer risk from scheme category. Integrate a current official scheme risk disclosure or approve a sourced methodology before writing production risk logic.
-- **Zerodha redirection:** No Zerodha transaction/redirect code or approved destination contract currently exists. Do not invent a destination URL or identifier mapping. Once product requirements and official integration details are supplied, test HTTPS allowlisting, query encoding, exact fund identifier mapping and safe external-navigation behaviour.
+- **Risk assessment:** No risk-scoring or Riskometer mapping implementation exists. The AMFI NAV feed does not provide sufficient information to derive Low/Medium/High risk. Use current scheme risk disclosures or approve a sourced methodology before implementing and testing a risk model.
+- **Zerodha redirection:** No Zerodha transaction/redirect code or approved destination contract exists. Define the integration and approved URL/identifier contract before testing HTTPS allowlisting, encoded parameters, scheme mapping and safe external navigation.
 
 ## Commands
 
 Backend (from backend/):
 
-    pip install -r requirements-dev.txt
-    pytest -m unit
-    pytest -m integration
-    pytest --cov=app --cov-report=term-missing --cov-fail-under=85
+```bash
+pip install -r requirements-dev.txt
+pytest -m unit
+pytest -m integration
+pytest --cov=app --cov-report=term-missing --cov-fail-under=85
+```
 
 Frontend (from frontend/):
 
-    npm install
-    npm run test:coverage -- --runInBand
-    npm run build
+```bash
+npm install
+npm run test:coverage -- --runInBand
+npm run build
+```

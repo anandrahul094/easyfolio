@@ -62,3 +62,37 @@ describe("fund explorer screen",()=>{
     expect(await screen.findByText(/No matching schemes found/i)).toBeInTheDocument();
   });
 });
+
+
+  test("warns when the source reports future-dated NAV records",async()=>{
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok:true,
+      json:async()=>({...apiResult,metadata:{...apiResult.metadata,future_nav_record_count:2}})
+    });
+    render(<Funds/>);
+    expect(await screen.findByRole("status")).toHaveTextContent(/2 scheme records have NAV dates later than today/i);
+  });
+
+  test("pagination requests the next page when more results are available",async()=>{
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok:true,
+      json:async()=>({...apiResult,total:48})
+    });
+    render(<Funds/>);
+    await screen.findByRole("heading",{name:"Alpha Large Cap Fund"});
+    fireEvent.click(screen.getByRole("button",{name:"Next →"}));
+    await waitFor(()=>expect(global.fetch).toHaveBeenLastCalledWith(
+      expect.stringContaining("page=2&limit=24"),
+      expect.objectContaining({signal:expect.any(Object)})
+    ));
+  });
+
+  test("search text is sent to the scheme API as a query parameter",async()=>{
+    render(<Funds/>);
+    await screen.findByRole("heading",{name:"Alpha Large Cap Fund"});
+    fireEvent.change(screen.getByRole("searchbox",{name:"Search schemes by name, ISIN or scheme code"}),{target:{value:"alpha fund"}});
+    await waitFor(()=>expect(global.fetch).toHaveBeenLastCalledWith(
+      expect.stringContaining("q=alpha+fund"),
+      expect.objectContaining({signal:expect.any(Object)})
+    ));
+  });
