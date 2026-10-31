@@ -10,10 +10,10 @@ from app.services.amfi import AMFIError
 from app.services.catalog import CatalogService
 
 FIXTURE_FEED = (
-    "Scheme Code;ISIN Div Payout/ ISIN Growth;ISIN Div Reinvestment;Scheme Name;Plan;Option;Net Asset Value;Date\\n"
-    "Open Ended Schemes(Equity Scheme - Large Cap Fund)\\n"
-    "Acme Mutual Fund\\n"
-    "100201;INF000000201;-;Acme Large Cap Fund;Direct Plan;Growth Option;25.4200;30-Oct-2026\\n"
+    "Scheme Code;ISIN Div Payout/ ISIN Growth;ISIN Div Reinvestment;Scheme Name;Plan;Option;Net Asset Value;Date\n"
+    "Open Ended Schemes(Equity Scheme - Large Cap Fund)\n"
+    "Acme Mutual Fund\n"
+    "100201;INF000000201;-;Acme Large Cap Fund;Direct Plan;Growth Option;25.4200;30-Oct-2026\n"
 )
 
 

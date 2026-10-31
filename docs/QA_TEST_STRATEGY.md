@@ -8,13 +8,13 @@ Every feature follows Red → Green → Refactor:
 3. Refactor: remove duplication and improve structure while keeping the suite green.
 4. Run the complete backend suite, frontend suite and production build before merging.
 
-The initial parser contract tests on this branch intentionally define behaviour that the current parser does not yet implement. Their expected failures are the Red phase, not a release candidate.
+The AMFI parser contract tests completed their Red–Green cycle. The backend suite now covers parser behaviour, AMFI fetch failures, cache refresh/retention and API endpoints.
 
 ## Frameworks
 
-- Backend: PyTest, pytest-cov, FastAPI TestClient (HTTPX), and standard-library mocks/fakes.
+- Backend: PyTest, pytest-cov, FastAPI TestClient (HTTPX), and deterministic mocks/fakes.
 - Frontend: Jest, next/jest, React Testing Library, user-event, jsdom and jest-dom.
-- CI: backend unit/integration tests and frontend component tests/build run independently.
+- CI: backend tests + coverage and frontend tests + Next.js production build run independently.
 
 ## Test layout
 
@@ -24,43 +24,50 @@ The initial parser contract tests on this branch intentionally define behaviour 
       app/repositories/
       tests/
         conftest.py
-        fixtures/amfi_metadata_contract.txt
-        unit/test_amfi_parser_contract.py
-        integration/README.md
-        test_parser.py (existing regression tests)
+        fixtures/
+        unit/
+          test_amfi_parser_contract.py
+          test_amfi_fetch.py
+        integration/
+          test_catalog_service.py
+          test_api.py
+        test_parser.py
       pytest.ini
       requirements-dev.txt
     frontend/
-      app/
-      __tests__/README.md
+      app/lib/finance.ts
+      app/compare/scheme-picker.tsx
+      __tests__/
+        finance.test.ts
+        compare.test.tsx
       jest.config.js
       jest.setup.ts
       package.json
 
-## Planned coverage by layer
+## Current automated coverage
 
-### Unit tests
+### Backend unit tests
+- Legacy and current AMFI feed formats, Direct/Growth filtering, category grouping, AMC attribution, whitespace normalisation, NAV decimal precision and complete Fund field preservation.
+- AMFI HTTP client: success/digest, timeout, connection failure, HTTP error, empty response and HTML response rejection.
 
-- AMFI parser: legacy and current feed formats, section context, AMC attribution, Direct/Growth filtering, category mapping, whitespace/control-character sanitisation, decimal precision, date parsing, invalid rows, duplicate scheme codes and stable field preservation.
-- Financial helpers: exact INR formatting, decimal-safe calculations, boundary inputs and documented rounding. Pure helpers should be extracted from UI components before tests are written.
-- Risk data: test the mapping only after a source-backed data contract is defined. The current AMFI NAV feed does not provide a scheme Riskometer or enough portfolio data to derive a reliable risk score.
+### Backend integration tests
+- Catalog refresh parses AMFI data and replaces the cached snapshot.
+- Cache hits avoid repeat network requests until expiry.
+- Upstream failures retain the last good snapshot and expose a stale status; a first-load failure raises instead of returning empty success.
+- FastAPI TestClient covers health, search, category filtering, pagination, scheme detail, 404, query validation and authenticated manual refresh.
 
-### Integration tests
+### Frontend tests
+- INR whole-rupee formatting and invalid-number rejection.
+- SIP end-of-month monthly-compounding formula, zero-rate result, negative assumptions and invalid inputs.
+- Compound-interest frequency, negative assumptions and validation.
+- Scheme comparison selection, removal, duplicate prevention, three-scheme limit and rendering of the comparison facts.
 
-- Catalog refresh: mocked AMFI HTTP responses, cache freshness, successful snapshot replacement, timeout/HTTP/invalid-feed errors, and stale-data retention.
-- API: FastAPI TestClient coverage for health, status, search/filter/pagination, missing scheme and refresh-token handling.
-- UI: React Testing Library interaction tests for selecting/removing schemes in the comparison flow, maximum selection count and rendered comparison fields. Extract the compare picker into a small client component to test it in isolation.
-- External redirects: no Zerodha/transaction redirection implementation currently exists. Add tests only after the product contract is approved: exact identifier mapping, HTTPS destination allowlist, encoded query parameters, rejection of unknown destinations, and safe new-window behaviour. Do not invent a Zerodha URL or imply transaction functionality is live.
+## Product features that are not present and therefore not testable yet
 
-## Current scope and known gaps
+- **Risk classification:** No risk-scoring or Riskometer mapping implementation currently exists. The AMFI NAV feed alone is insufficient to calculate Low/Medium/High risk. Do not infer risk from scheme category. Integrate a current official scheme risk disclosure or approve a sourced methodology before writing production risk logic.
+- **Zerodha redirection:** No Zerodha transaction/redirect code or approved destination contract currently exists. Do not invent a destination URL or identifier mapping. Once product requirements and official integration details are supplied, test HTTPS allowlisting, query encoding, exact fund identifier mapping and safe external-navigation behaviour.
 
-- AMFI parsing and catalog caching exist in backend/app/services/amfi.py and backend/app/services/catalog.py.
-- Fund includes scheme identity, ISIN Growth, NAV/date, plan/option, category/subcategory, beginner tag and optional AMC name. The parser currently does not populate the AMC name from the fund-house line; the Red tests specify that missing behaviour.
-- Risk scoring and transaction redirection are not implemented.
-- The frontend currently has no dedicated Zerodha integration or isolated formatter library.
-- Do not convert a category into a Low/Medium/High risk label. Risk should be sourced from the scheme's declared current risk disclosure, or a formally approved and documented methodology using adequate source data.
-
-## Local commands
+## Commands
 
 Backend (from backend/):
 
