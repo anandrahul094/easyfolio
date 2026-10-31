@@ -12,5 +12,7 @@ jobs:
         with:
           node-version: "20"
       - run: npm install
-      - run: npm test -- --passWithNoTests --runInBand
-      - run: npm run build
+      - name: Jest and coverage report
+        run: npm run test:coverage -- --runInBand
+      - name: Next.js production build
+        run: npm run build

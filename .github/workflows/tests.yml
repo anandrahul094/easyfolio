@@ -12,4 +12,9 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -r requirements-dev.txt
-      - run: pytest --cov=app --cov-report=term-missing
+      - name: Unit tests
+        run: pytest -m unit
+      - name: Integration tests
+        run: pytest -m integration
+      - name: Full suite with coverage gate
+        run: pytest --cov=app --cov-report=term-missing --cov-fail-under=85

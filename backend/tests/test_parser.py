@@ -1,3 +1,5 @@
+import pytest
+
 from app.services.amfi import parse_feed
 
 LEGACY_SAMPLE = """AMC
@@ -35,6 +37,7 @@ Example Mutual Fund
 """
 
 
+@pytest.mark.unit
 def test_direct_growth_filter_legacy_format():
     funds, stats = parse_feed(LEGACY_SAMPLE)
     assert len(funds) == 1
@@ -44,6 +47,7 @@ def test_direct_growth_filter_legacy_format():
     assert stats["rows_seen"] == 2
 
 
+@pytest.mark.unit
 def test_current_amfi_category_headers_and_plan_filter():
     funds, stats = parse_feed(CURRENT_SAMPLE)
     by_code = {fund.scheme_code: fund for fund in funds}

@@ -74,11 +74,10 @@ Backend (from backend/):
     pip install -r requirements-dev.txt
     pytest -m unit
     pytest -m integration
-    pytest --cov=app --cov-report=term-missing
+    pytest --cov=app --cov-report=term-missing --cov-fail-under=85
 
 Frontend (from frontend/):
 
     npm install
-    npm test -- --runInBand
-    npm run test:coverage
+    npm run test:coverage -- --runInBand
     npm run build

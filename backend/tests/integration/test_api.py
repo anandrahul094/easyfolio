@@ -96,3 +96,58 @@ def test_catalog_unavailable_returns_503_not_an_empty_success(api_client, monkey
     response = client.get("/api/v1/schemes")
     assert response.status_code == 503
     assert "upstream unavailable" in response.json()["detail"]
+
+
+@pytest.mark.integration
+def test_status_endpoint_exposes_cache_freshness_metadata(api_client):
+    client, _service = api_client
+    response = client.get("/api/v1/status")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["status"] == "ready"
+    assert body["record_count"] == 3
+    assert body["source"] == "AMFI"
+    assert body["cache_expires_at"] is not None
+
+
+@pytest.mark.integration
+def test_status_and_scheme_detail_map_catalog_failures_to_503(api_client, monkeypatch):
+    client, service = api_client
+
+    def unavailable():
+        raise AMFIError("AMFI temporarily unavailable")
+
+    monkeypatch.setattr(service, "ensure_fresh", unavailable)
+
+    status_response = client.get("/api/v1/status")
+    detail_response = client.get("/api/v1/schemes/1001")
+
+    assert status_response.status_code == 503
+    assert detail_response.status_code == 503
+    assert "AMFI temporarily unavailable" in status_response.json()["detail"]
+
+
+@pytest.mark.integration
+def test_manual_refresh_route_is_hidden_when_no_token_is_configured(api_client, monkeypatch):
+    client, _service = api_client
+    monkeypatch.setattr(api_module, "REFRESH_TOKEN", "")
+
+    response = client.post("/api/v1/internal/refresh", headers={"X-Refresh-Token": "qa-test-token"})
+
+    assert response.status_code == 404
+
+
+@pytest.mark.integration
+def test_manual_refresh_maps_upstream_failure_to_502(api_client, monkeypatch):
+    client, service = api_client
+
+    def unavailable():
+        raise AMFIError("upstream refresh failed")
+
+    monkeypatch.setattr(service, "refresh", unavailable)
+
+    response = client.post("/api/v1/internal/refresh", headers={"X-Refresh-Token": "qa-test-token"})
+
+    assert response.status_code == 502
+    assert "upstream refresh failed" in response.json()["detail"]
