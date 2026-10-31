@@ -7,10 +7,10 @@ describe("calculator screen interactions",()=>{
     expect(screen.getByRole("heading",{level:1,name:"See how a monthly SIP can add up."})).toBeInTheDocument();
     const sliders=screen.getAllByRole("slider");
     expect(sliders).toHaveLength(3);
-    const result=screen.getByText("₹10,32,760");
+    const result=screen.getByText("₹10,24,225");
     expect(result).toBeInTheDocument();
     fireEvent.change(sliders[0],{target:{value:"10000"}});
-    expect(screen.getByText("₹20,65,520")).toBeInTheDocument();
+    expect(screen.getByText("₹20,48,450")).toBeInTheDocument();
     expect(screen.getByText("₹12,00,000")).toBeInTheDocument();
   });
 

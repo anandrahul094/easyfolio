@@ -26,7 +26,8 @@ describe("fund explorer screen",()=>{
     expect(await screen.findByRole("heading",{name:"Alpha Large Cap Fund"})).toBeInTheDocument();
     expect(screen.getByRole("heading",{name:"Beta Liquid Fund"})).toBeInTheDocument();
     expect(screen.getByText(/Source: AMFI.*Latest NAV date in feed: 2026-10-30/)).toBeInTheDocument();
-    expect(screen.getByRole("link",{name:/View scheme details/i})).toHaveAttribute("href","/funds/1001");
+    expect(screen.getAllByRole("link",{name:/View scheme details/i})).toHaveLength(2);
+    expect(screen.getAllByRole("link",{name:/View scheme details/i})[0]).toHaveAttribute("href","/funds/1001");
     expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining("/api/v1/schemes?page=1&limit=24"),expect.objectContaining({signal:expect.any(Object)}));
   });
 
