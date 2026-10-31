@@ -133,16 +133,16 @@ test("comparison supports add, remove and renders available scheme facts",async(
   await search.fill("Alpha");
   await page.getByRole("button",{name:"Add Alpha Large Cap Fund"}).click();
   await expect(page.getByRole("article",{name:"Scheme A: Alpha Large Cap Fund"})).toBeVisible();
-  await expect(page.getByRole("cell",{name:"Alpha Mutual Fund"})).toBeVisible();
+  await expect(page.getByText("Alpha Mutual Fund")).toBeVisible();
   await search.fill("Beta");
   await page.getByRole("button",{name:"Add Beta Liquid Fund"}).click();
   await expect(page.getByText("2 selected")).toBeVisible();
-  await expect(page.getByRole("cell",{name:"INF000000202"})).toBeVisible();
+  await expect(page.getByText("INF000000202")).toBeVisible();
   await page.getByRole("button",{name:"Remove Alpha Large Cap Fund"}).click();
   await expect(page.getByRole("article",{name:"Scheme A: Beta Liquid Fund"})).toBeVisible();
   await expect(page.getByRole("article",{name:"Empty scheme slot B"})).toBeVisible();
-  await expect(page.getByRole("cell",{name:"Alpha Mutual Fund"})).toHaveCount(0);
-  await expect(page.getByRole("cell",{name:"Beta Asset Management"})).toBeVisible();
+  await expect(page.getByText("Alpha Mutual Fund")).toHaveCount(0);
+  await expect(page.getByText("Beta Asset Management")).toBeVisible();
 });
 
 test("SIP and compound calculators expose their assumptions and update results",async({page})=>{

@@ -2,6 +2,7 @@
 import {useEffect,useState} from "react";
 import Link from "next/link";
 import {PageIntro,Note,Pill} from "../ui";
+import {ChartLine} from "lucide-react";
 import {SchemePicker,type ComparableFund} from "./scheme-picker";
 
 const API=process.env.NEXT_PUBLIC_API_BASE_URL??"http://localhost:8000";
@@ -73,11 +74,19 @@ export default function Compare(){
       onQueryChange={setQuery} onAdd={add} onRemove={remove}/>
     {selected.length>0&&<>
       <div className="results-head"><h2>Available scheme information</h2><Pill>{selected.length} selected</Pill></div>
-      <div className="compare-table-wrap">
-        <table className="compare-table">
-          <thead><tr><th>INFORMATION</th>{selected.map(fund=><th key={fund.scheme_code}>{fund.scheme_name}</th>)}</tr></thead>
-          <tbody>{metrics.map(([label,get])=><tr key={label}><td>{label}</td>{selected.map(fund=><td key={fund.scheme_code}>{get(fund)}</td>)}</tr>)}</tbody>
-        </table>
+      <div className="grid gap-4" style={{gridTemplateColumns:"repeat(auto-fit,minmax(min(100%,270px),1fr))"}}>
+        {selected.map(fund=><article key={fund.scheme_code} className="visual-card">
+          <div className="mb-4 flex items-start justify-between gap-3">
+            <div><span className="pill">DIRECT · GROWTH</span><h3 className="mt-3 font-['Space_Grotesk'] text-lg font-semibold text-white">{fund.scheme_name}</h3><p className="mt-1 text-[10px] text-slate-400">{fund.amc_name??"AMC not supplied"}</p></div>
+            <span className="icon-chip"><ChartLine size={17}/></span>
+          </div>
+          <div className="rounded-2xl border border-violet-200/15 bg-violet-300/[.07] p-4">
+            <span className="metric-label">LATEST NAV</span><div className="metric-number">₹{Number(fund.nav).toLocaleString("en-IN",{maximumFractionDigits:4})}</div><span className="text-[10px] text-slate-400">NAV date · {fund.nav_date}</span>
+          </div>
+          <dl className="mt-4 grid grid-cols-2 gap-2">
+            {metrics.filter(([label])=>!["Scheme name","AMC","Latest NAV","NAV date"].includes(label)).map(([label,get])=><div key={label} className="rounded-xl border border-white/10 bg-white/[.035] p-3"><dt className="text-[9px] font-bold uppercase tracking-wider text-slate-500">{label}</dt><dd className="mt-1 break-words text-xs font-semibold text-slate-200">{get(fund)}</dd></div>)}
+          </dl>
+        </article>)}
       </div>
     </>}
     <div style={{marginTop:24}}><Note title="Metrics not yet in the data source">
