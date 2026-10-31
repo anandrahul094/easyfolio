@@ -1,72 +1,10 @@
 "use client";
-import { useEffect, useState } from "react";
-
-type Fund = { scheme_code:number; scheme_name:string; isin_growth:string; nav:string; nav_date:string; category:string|null; subcategory:string|null };
-type Result = { data:Fund[]; total:number; metadata:{latest_nav_date:string|null;future_nav_record_count:number} };
-const API = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
-const CATEGORIES = ["All categories", "Equity", "Debt", "Hybrid", "Life Cycle", "Solution Oriented", "Other", "Unclassified"];
-
-export default function FundsPage() {
- const [funds,setFunds]=useState<Fund[]>([]);
- const [query,setQuery]=useState("");
- const [category,setCategory]=useState("All categories");
- const [loading,setLoading]=useState(true);
- const [error,setError]=useState("");
- const [navDate,setNavDate]=useState<string|null>(null);
- const [futureNavCount,setFutureNavCount]=useState(0);
- const [total,setTotal]=useState(0);
-
- useEffect(()=>{
-  const controller=new AbortController();
-  const timer=setTimeout(async()=>{
-   setLoading(true);setError("");
-   try{
-    const params=new URLSearchParams({page:"1",limit:"100"});
-    if(query.trim())params.set("q",query.trim());
-    if(category!=="All categories")params.set("category",category);
-    const response=await fetch(`${API}/api/v1/schemes?${params}`,{signal:controller.signal});
-    if(!response.ok)throw new Error(`Fund data unavailable (${response.status})`);
-    const result:Result=await response.json();
-    setFunds(result.data);setTotal(result.total);setNavDate(result.metadata.latest_nav_date);
-    setFutureNavCount(result.metadata.future_nav_record_count??0);
-   }catch(e){if(!controller.signal.aborted)setError(e instanceof Error?e.message:"Unable to load data");}
-   finally{if(!controller.signal.aborted)setLoading(false);}
-  },250);
-  return()=>{clearTimeout(timer);controller.abort();};
- },[query,category]);
-
- return <main className="page-shell"><section className="page-intro"><span className="eyebrow">FUND EXPLORER</span><h1>Explore mutual funds</h1><p>Search Direct Growth schemes and understand the information published by AMFI.</p></section>
-  <div style={{color:"#15803d",fontWeight:800,letterSpacing:1}}>EASYFOLIO</div>
-  <h1 style={{fontSize:"clamp(34px,5vw,56px)",lineHeight:1.08,marginBottom:8}}>Understand funds.<br/>Compare clearly.</h1>
-  <p style={{color:"#475569",maxWidth:650,lineHeight:1.6}}>Explore Direct Growth mutual fund schemes using published NAV information. Research independently before investing.</p>
-  <p style={{fontSize:13,color:"#64748b"}}>Source: AMFI · Latest NAV date in feed: {navDate??"Loading"}</p>
-  {futureNavCount>0&&<p role="status" style={{fontSize:13,color:"#92400e",background:"#fffbeb",border:"1px solid #fcd34d",padding:12,borderRadius:10}}>Data check: {futureNavCount} scheme records have NAV dates later than today. Please verify these dates with the AMC before relying on them.</p>}
-  <label htmlFor="search" style={{display:"block",fontWeight:700,marginTop:32,marginBottom:8}}>Find a mutual fund</label>
-  <input id="search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Scheme name, ISIN or scheme code" style={{width:"100%",boxSizing:"border-box",padding:15,border:"1px solid #cbd5e1",borderRadius:12,fontSize:16}}/>
-  <div style={{display:"flex",flexWrap:"wrap",alignItems:"end",gap:12,marginTop:18}}>
-   <div><label htmlFor="category" style={{display:"block",fontWeight:700,marginBottom:7}}>Filter by category</label>
-    <select id="category" value={category} onChange={e=>setCategory(e.target.value)} style={{minWidth:220,padding:12,border:"1px solid #cbd5e1",borderRadius:10,background:"white",fontSize:14}}>
-     {CATEGORIES.map(item=><option key={item} value={item}>{item}</option>)}
-    </select>
-   </div>
-   <div style={{color:"#64748b",fontSize:13,paddingBottom:12}}>{loading?"Updating results…":`${total.toLocaleString("en-IN")} matching schemes`}</div>
-  </div>
-  <h2 style={{marginTop:30}}>Direct Growth schemes</h2>
-  {loading&&<p>Loading published NAV data…</p>}
-  {error&&<p role="alert" style={{color:"#b91c1c"}}>{error}</p>}
-  {!loading&&!error&&funds.length===0&&<p>No matching schemes found.</p>}
-  <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(270px,1fr))",gap:14}}>
-   {funds.map(f=><article key={f.scheme_code} style={{background:"white",border:"1px solid #e2e8f0",borderRadius:15,padding:18}}>
-    <small style={{color:"#15803d",fontWeight:800}}>DIRECT · GROWTH</small>
-    <h3 style={{fontSize:16,lineHeight:1.45}}>{f.scheme_name}</h3>
-    <strong style={{fontSize:24}}>₹{Number(f.nav).toLocaleString("en-IN",{maximumFractionDigits:4})}</strong>
-    <div style={{fontSize:12,color:"#64748b"}}>NAV date: {f.nav_date}</div>
-    <div style={{display:"flex",flexWrap:"wrap",gap:6,marginTop:10}}>
-     {f.category?<span style={{fontSize:11,color:"#166534",background:"#f0fdf4",borderRadius:20,padding:"4px 8px"}}>{f.category}</span>:<span style={{fontSize:11,color:"#64748b",background:"#f1f5f9",borderRadius:20,padding:"4px 8px"}}>Unclassified</span>}
-     {f.subcategory&&<span style={{fontSize:11,color:"#475569",background:"#f1f5f9",borderRadius:20,padding:"4px 8px"}}>{f.subcategory}</span>}
-    </div>
-   </article>)}
-  </div>
-  <footer style={{borderTop:"1px solid #e2e8f0",marginTop:48,paddingTop:18,color:"#64748b",fontSize:12,lineHeight:1.6}}>EasyFolio is an informational research interface, not an investment adviser, broker or transaction platform. Mutual fund investments are subject to market risks. Verify scheme details and documents with the AMC before investing.</footer>
- </main>;
-}
+import {useEffect,useState} from "react";import Link from "next/link";import {PageIntro,Pill} from "../ui";
+type Fund={scheme_code:number;isin_growth:string;scheme_name:string;nav:string|number;nav_date:string;category:string|null;subcategory:string|null;amc_name?:string|null};
+type Result={data:Fund[];page:number;limit:number;total:number;metadata:{source?:string;latest_nav_date:string|null;future_nav_record_count:number;fetched_at?:string|null}};
+const API=process.env.NEXT_PUBLIC_API_BASE_URL??"http://localhost:8000";const cats=["All categories","Equity","Debt","Hybrid","Life Cycle","Solution Oriented","Other","Unclassified"];
+export default function Funds(){const[q,setQ]=useState(""),[category,setCategory]=useState("All categories"),[page,setPage]=useState(1),[result,setResult]=useState<Result|null>(null),[busy,setBusy]=useState(true),[error,setError]=useState("");
+useEffect(()=>{const v=new URLSearchParams(window.location.search).get("category");if(v&&cats.includes(v))setCategory(v);},[]);
+useEffect(()=>{const c=new AbortController(),t=setTimeout(async()=>{setBusy(true);setError("");try{const p=new URLSearchParams({page:String(page),limit:"24"});if(q.trim())p.set("q",q.trim());if(category!=="All categories")p.set("category",category);const r=await fetch(API+"/api/v1/schemes?"+p,{signal:c.signal});if(!r.ok)throw new Error("Fund data is temporarily unavailable ("+r.status+").");setResult(await r.json());}catch(e){if(!c.signal.aborted)setError(e instanceof Error?e.message:"Unable to load scheme data.");}finally{if(!c.signal.aborted)setBusy(false);}},250);return()=>{clearTimeout(t);c.abort();};},[q,category,page]);
+const funds=result?.data??[],pages=result?Math.max(1,Math.ceil(result.total/result.limit)):1;
+return <main className="page-shell"><PageIntro eyebrow="AMFI-SOURCED SCHEME DISCOVERY" title="Research funds, one detail at a time." description="Search Direct Growth schemes, explore their published NAV information and use category labels to narrow your reading. Scheme values are displayed with their source and NAV date."/><div className="search-toolbar"><input className="field" aria-label="Search schemes" placeholder="Scheme name, ISIN or scheme code" value={q} onChange={e=>{setQ(e.target.value);setPage(1)}}/><select className="select" aria-label="Filter by category" value={category} onChange={e=>{setCategory(e.target.value);setPage(1)}}>{cats.map(c=><option key={c}>{c}</option>)}</select></div><div className="filter-row">{cats.map(c=><button key={c} className="filter-chip" aria-pressed={category===c} onClick={()=>{setCategory(c);setPage(1)}}>{c}</button>)}</div><div className="results-head"><h2>Direct Growth schemes</h2><p>{busy?"Updating results…":result?result.total.toLocaleString("en-IN")+" matching schemes":"Waiting for AMFI data"}</p></div>{result&&<p className="source-line">Source: {result.metadata.source??"AMFI"} · Latest NAV date in feed: {result.metadata.latest_nav_date??"Not available"}</p>}{(result?.metadata.future_nav_record_count??0)>0&&<p className="error-state" role="status">{result?.metadata.future_nav_record_count} scheme records have NAV dates later than today. Verify with the AMC.</p>}{error&&<p className="error-state" role="alert">{error}</p>}{busy&&!result&&<p className="empty-state">Loading published NAV data…</p>}{!busy&&!error&&!funds.length&&<p className="empty-state">No matching schemes found. Try a broader search or another category.</p>}<div className="fund-grid">{funds.map(f=><article className="fund-card" key={f.scheme_code}><Pill>DIRECT · GROWTH</Pill><h3>{f.scheme_name}</h3><div className="fund-value">₹{Number(f.nav).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:4})}</div><div className="fund-meta">NAV date: {f.nav_date}<br/>Scheme code: {f.scheme_code}</div><div className="fund-tags">{f.category?<Pill>{f.category}</Pill>:<Pill tone="neutral">Unclassified</Pill>}{f.subcategory&&<Pill tone="neutral">{f.subcategory}</Pill>}</div><Link className="text-link" href={"/funds/"+f.scheme_code}>View scheme details →</Link></article>)}</div>{result&&pages>1&&<div className="wizard-actions"><button className="button-secondary" disabled={page<=1||busy} onClick={()=>setPage(v=>v-1)}>← Previous</button><span className="small-muted">Page {page} of {pages}</span><button className="button-secondary" disabled={page>=pages||busy} onClick={()=>setPage(v=>v+1)}>Next →</button></div>}<p className="source-line">The AMFI NAV feed provides scheme identity, plan/option, classification where available, ISIN Growth, NAV and NAV date. Other metrics require separately verified disclosures.</p></main>}

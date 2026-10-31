@@ -1,0 +1,1 @@
+import {SipCalculator} from "../calculator-tools";export const metadata={title:"SIP calculator"};export default function SipPage(){return <SipCalculator/>}

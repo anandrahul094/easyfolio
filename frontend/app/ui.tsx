@@ -1,0 +1,5 @@
+import Link from "next/link";import type {ReactNode} from "react";
+export function PageIntro({eyebrow,title,description,children}:{eyebrow:string;title:string;description:string;children?:ReactNode}){return <header className="page-intro"><span className="eyebrow">{eyebrow}</span><h1>{title}</h1><p>{description}</p>{children}</header>}
+export function InfoCard({icon="✳",title,description,href,link="Explore →"}:{icon?:string;title:string;description:string;href?:string;link?:string}){return <article className="info-card"><div className="card-icon" aria-hidden="true">{icon}</div><h3>{title}</h3><p>{description}</p>{href&&<Link className="text-link" href={href}>{link}</Link>}</article>}
+export function Note({title,children}:{title?:string;children:ReactNode}){return <aside className="callout">{title&&<h3>{title}</h3>}{children}</aside>}
+export function Pill({children,tone="green"}:{children:ReactNode;tone?:"green"|"neutral"|"warning"}){return <span className={tone==="warning"?"pill pill-warning":tone==="neutral"?"pill pill-neutral":"pill"}>{children}</span>}

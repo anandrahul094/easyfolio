@@ -1,0 +1,1 @@
+import {CompoundCalculator} from "../calculator-tools";export const metadata={title:"Compound interest calculator"};export default function CompoundPage(){return <CompoundCalculator/>}
