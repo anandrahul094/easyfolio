@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-export const metadata: Metadata = { title: "EasyFolio", description: "Beginner-friendly mutual fund discovery." };
-export default function RootLayout({ children }: Readonly<{children: React.ReactNode}>) {
-  return <html lang="en"><body style={{margin:0,fontFamily:"Arial,sans-serif",background:"#f8fafc",color:"#0f172a"}}>{children}</body></html>;
-}
+import Link from "next/link";
+import "./globals.css";
+export const metadata: Metadata = { title: { default: "EasyFolio — Mutual funds, made easier", template: "%s | EasyFolio" }, description: "Learn mutual fund basics, understand risks and explore Indian mutual fund schemes." };
+const nav=[["/learn","Learn"],["/categories","Categories"],["/funds","Explore funds"],["/compare","Compare"],["/glossary","Glossary"]];
+export default function RootLayout({children}:{children:React.ReactNode}){return <html lang="en"><body><header className="site-header"><div className="nav-wrap"><Link href="/" className="brand"><span className="brand-mark">e</span><span>easyfolio<span className="brand-dot">.</span><small>LEARN · EXPLORE · UNDERSTAND</small></span></Link><nav className="desktop-nav">{nav.map(([href,label])=><Link key={href} href={href}>{label}</Link>)}</nav><Link href="/discover" className="nav-cta">Find your starting point ↗</Link></div></header>{children}<footer className="site-footer"><div className="footer-inner"><div><Link href="/" className="brand">easyfolio<span className="brand-dot">.</span></Link><p>Mutual funds, made easier to understand.</p></div><div className="footer-links"><Link href="/learn">Learn</Link><Link href="/funds">Explore funds</Link><Link href="/glossary">Glossary</Link><Link href="/about">About</Link></div><p className="disclaimer">EasyFolio is an educational and research tool, not investment advice. Mutual fund investments are subject to market risks. Read all scheme-related documents carefully and verify information with the relevant AMC.</p></div></footer></body></html>}
