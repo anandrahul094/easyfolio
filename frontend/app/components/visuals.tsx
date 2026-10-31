@@ -5,6 +5,7 @@ import {
   Area,AreaChart,CartesianGrid,Cell,Pie,Legend,PieChart,
   ResponsiveContainer,Tooltip,XAxis,YAxis
 } from "recharts";
+import {Database} from "lucide-react";
 import {calculateSip,formatInr} from "../lib/finance";
 
 export type ProjectionPoint={year:number;invested:number;projected:number;growth:number};
@@ -44,7 +45,7 @@ function useRevealed(){
   return {ref,visible,animate:visible&&!reducedMotion};
 }
 
-const moneyTick=(value:number)=>value>=10000000?"₹"+(value/10000000).toFixed(1)+"Cr":value>=100000?"₹"+(value/100000).toFixed(0)+"L":"₹"+Math.round(value/1000)+"k";
+const moneyTick=(value:number)=>value<=0?"₹0":value>=10000000?"₹"+(value/10000000).toFixed(1)+"Cr":value>=100000?"₹"+(value/100000).toFixed(0)+"L":"₹"+Math.round(value/1000)+"k";
 
 export function ProjectionCurve({data,compact=false}:{data:ProjectionPoint[];compact?:boolean}){
   const {ref,visible,animate}=useRevealed();
