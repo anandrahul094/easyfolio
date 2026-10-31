@@ -20,6 +20,8 @@ CATEGORY_GROUPS = {
     "income/debt oriented schemes": "Debt",
     "hybrid scheme": "Hybrid", "hybrid schemes": "Hybrid",
     "life cycle funds": "Life Cycle",
+    "solution oriented scheme": "Solution Oriented",
+    "solution oriented schemes": "Solution Oriented",
     "other scheme": "Other", "other schemes": "Other",
     "exchange traded funds (etfs)": "Other", "index funds": "Other",
     "fund of funds scheme (domestic)": "Other", "overseas fund of funds": "Other",
