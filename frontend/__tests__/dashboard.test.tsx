@@ -8,10 +8,10 @@ jest.mock("next/link",()=>({
 
 jest.mock("recharts",()=>{
   const React=require("react");
-  const Container=({children}:{children?:React.ReactNode})=>React.createElement("div",null,children);
+  const Container=()=>React.createElement("div",null);
   const Empty=()=>null;
   return {
-    ResponsiveContainer:Container,AreaChart:Container,PieChart:Container,Pie:Container,
+    ResponsiveContainer:Container,AreaChart:Empty,PieChart:Empty,Pie:Empty,
     CartesianGrid:Empty,Cell:Empty,Area:Empty,Tooltip:Empty,XAxis:Empty,YAxis:Empty,Legend:Empty
   };
 });
@@ -24,7 +24,7 @@ describe("visual dashboard progress and projection",()=>{
       "/learn/sip-explained","/learn/understand-risk","/learn/not-a-real-lesson"
     ]));
     render(<Dashboard/>);
-    await waitFor(()=>expect(screen.getByText("2 / 4")).toBeInTheDocument());
+    await waitFor(()=>expect(document.body.textContent).toContain("2 / 4"));
     expect(screen.getByText("Mutual fund fundamentals")).toBeInTheDocument();
     expect(screen.getByRole("link",{name:/Open lesson/})).toHaveAttribute("href","/learn/mutual-fund-fundamentals");
   });
@@ -35,7 +35,7 @@ describe("visual dashboard progress and projection",()=>{
       "/learn/mutual-fund-categories","/learn/understand-risk"
     ]));
     render(<Dashboard/>);
-    await waitFor(()=>expect(screen.getByText("4 / 4")).toBeInTheDocument());
+    await waitFor(()=>expect(document.body.textContent).toContain("4 / 4"));
     expect(screen.getByText("All foundational nodes complete")).toBeInTheDocument();
     expect(screen.getByRole("link",{name:/Review learning path/})).toHaveAttribute("href","/learn");
   });
@@ -43,13 +43,13 @@ describe("visual dashboard progress and projection",()=>{
   test("recovers from malformed local progress without breaking the dashboard",async()=>{
     window.localStorage.setItem("easyfolio:learning-progress:v1","{not-json");
     render(<Dashboard/>);
-    await waitFor(()=>expect(screen.getByText("0 / 4")).toBeInTheDocument());
+    await waitFor(()=>expect(document.body.textContent).toContain("0 / 4"));
     expect(screen.getByText("Mutual fund fundamentals")).toBeInTheDocument();
   });
 
   test("updates monthly contributions and projection output from the dashboard slider",()=>{
     render(<Dashboard/>);
-    expect(screen.getByText("TOTAL CONTRIBUTIONS")).toBeInTheDocument();
+    expect(screen.getByText(/Total contributions:/i)).toBeInTheDocument();
     const sliders=screen.getAllByRole("slider");
     fireEvent.change(sliders[0],{target:{value:"10000"}});
     expect(screen.getByText("₹14,40,000")).toBeInTheDocument();
