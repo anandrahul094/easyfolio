@@ -23,6 +23,7 @@ def list_schemes(
     q: str | None = None,
     category: str | None = None,
     beginner_tag: str | None = None,
+    subcategory: str | None = None,
     page: int = Query(1, ge=1),
     limit: int = Query(20, ge=1, le=100),
 ):
@@ -30,7 +31,7 @@ def list_schemes(
         metadata = catalog.ensure_fresh()
     except AMFIError as exc:
         raise HTTPException(status_code=503, detail=str(exc))
-    funds = catalog.repository.list_funds(q, category, beginner_tag)
+    funds = catalog.repository.list_funds(q, category, beginner_tag, subcategory)
     start = (page - 1) * limit
     return {"data": funds[start:start+limit], "page": page, "limit": limit, "total": len(funds), "metadata": metadata}
 
