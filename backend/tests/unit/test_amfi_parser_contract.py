@@ -13,7 +13,6 @@ def test_maps_fund_house_name_to_each_scheme(amfi_metadata_contract_feed):
     by_code = {fund.scheme_code: fund for fund in funds}
 
     assert by_code[100201].amc_name == "Acme Mutual Fund"
-    assert by_code[100202].amc_name == "Beta Asset Management"
 
 
 @pytest.mark.unit
@@ -43,8 +42,8 @@ def test_fund_house_context_changes_at_each_new_amc_header(amfi_metadata_contrac
     funds, _stats = parse_feed(amfi_metadata_contract_feed)
     by_code = {fund.scheme_code: fund for fund in funds}
 
-    assert by_code[100201].amc_name == "Acme Mutual Fund"
     assert by_code[100202].amc_name == "Beta Asset Management"
+    assert by_code[100202].amc_name != by_code[100201].amc_name
 
 
 @pytest.mark.unit
