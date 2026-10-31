@@ -12,6 +12,7 @@ class Fund(BaseModel):
     plan: str = "direct"
     option: str = "growth"
     category: str | None = None
+    subcategory: str | None = None
     beginner_tag: str | None = None
     amc_name: str | None = None
 
