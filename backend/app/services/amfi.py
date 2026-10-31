@@ -12,7 +12,7 @@ from app.models import Fund
 DIRECT = re.compile(r"\bdirect\b", re.I)
 GROWTH = re.compile(r"\bgrowth\b", re.I)
 EXCLUDE = re.compile(r"\b(idcw|dividend|payout|reinvestment)\b", re.I)
-SECTION = re.compile(r"^(?:Open Ended|Close Ended|Interval(?: Fund)? Schemes)\s*\((.+)\)$", re.I)
+SECTION = re.compile(r"^(?:Open Ended|Close Ended|Interval)(?: Fund)? Schemes\s*\((.+)\)$", re.I)
 
 CATEGORY_GROUPS = {
     "equity scheme": "Equity", "equity schemes": "Equity",
