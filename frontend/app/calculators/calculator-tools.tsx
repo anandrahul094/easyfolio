@@ -14,10 +14,11 @@ function Slider({label,value,min,max,step,unit,onChange}:{label:string;value:num
   </label>;
 }
 
-function ProjectionResult({invested,future,growth}:{invested:number;future:number;growth:number}){
+function ProjectionResult({invested,future,growth,context}:{invested:number;future:number;growth:number;context:string}){
   return <section className="result-panel" aria-live="polite" aria-atomic="true">
     <span className="eyebrow">ILLUSTRATIVE FUTURE VALUE</span>
     <div className="result-number">{formatInr(future)}</div>
+    <p className="text-[10px] text-violet-50/85">{context}</p>
     <div className={"metric-trend "+(growth<0?"text-rose-200":"text-emerald-200")}>{growth<0?<ArrowDownRight size={13}/>:<ArrowUpRight size={13}/>} {formatInr(Math.abs(growth))} {growth<0?"illustrative loss":"illustrative growth"}</div>
     <div className="result-pair">
       <div><span>TOTAL INVESTED</span><strong>{formatInr(invested)}</strong></div>
@@ -50,7 +51,7 @@ export function SipCalculator(){
         <div className="bento-card-head"><div><span className="eyebrow">PROJECTION CURVE</span><h2 className="mt-2">Your money over time</h2><p>Change any assumption to recalculate this curve instantly.</p></div><span className="pill">Illustrative</span></div>
         <ProjectionCurve data={series}/>
         <div className="chart-caption"><span className="chart-legend"><i className="legend-dot" style={{background:"#a993ff"}}/>Illustrative value</span><span className="chart-legend"><i className="legend-dot" style={{background:"#43d6a9"}}/>Contributions</span></div>
-        <div className="mt-5"><ProjectionResult invested={result.investedAmount} future={result.futureValue} growth={result.growth}/></div>
+        <div className="mt-5"><ProjectionResult invested={result.investedAmount} future={result.futureValue} growth={result.growth} context={formatInr(monthly)+" monthly · "+rate+"% assumed annual return · "+years+" years"}/></div>
       </section>
     </div>
     <div className="mt-6"><Note title="An illustration is not a forecast"><p>End-of-month instalments and monthly compounding of the assumed annual rate. Actual investment returns vary and may be negative. A SIP does not guarantee returns or eliminate market risk.</p></Note></div>
@@ -83,7 +84,7 @@ export function CompoundCalculator(){
       <section className="bento-card bento-span-8">
         <div className="bento-card-head"><div><span className="eyebrow">COMPOUNDING CURVE</span><h2 className="mt-2">See compounding unfold</h2><p>Frequency and time horizon change the projection path.</p></div><span className="pill">Illustrative</span></div>
         <ProjectionCurve data={series}/>
-        <div className="mt-5"><ProjectionResult invested={result.investedAmount} future={result.futureValue} growth={result.growth}/></div>
+        <div className="mt-5"><ProjectionResult invested={result.investedAmount} future={result.futureValue} growth={result.growth} context={formatInr(principal)+" initial amount · "+rate+"% assumed annual rate · "+years+" years · "+options.find(option=>option[1]===frequency)?.[0]}/></div>
       </section>
     </div>
     <div className="mt-6"><Note title="Compounding describes a formula — not a guaranteed outcome"><p>Actual market-linked investment returns are uneven and may be negative. This calculator does not represent returns of any mutual fund or asset class. Fees, taxes and inflation are excluded.</p></Note></div>
