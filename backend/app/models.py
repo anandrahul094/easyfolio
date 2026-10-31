@@ -21,5 +21,6 @@ class DataStatus(BaseModel):
     fetched_at: datetime | None = None
     latest_nav_date: date | None = None
     record_count: int = 0
+    future_nav_record_count: int = 0
     cache_expires_at: datetime | None = None
     message: str | None = None
