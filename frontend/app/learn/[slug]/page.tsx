@@ -2,7 +2,7 @@ import Link from "next/link";
 import {notFound} from "next/navigation";
 import {PageIntro,Note} from "../../ui";
 
-type Section={heading:string;paragraphs:string[];bullets?:string[]};
+type Section={heading:string;paragraphs?:string[];bullets?:string[]};
 type Lesson={title:string;summary:string;read:string;sections:Section[];takeaway:string;related:string;relatedHref:string};
 const lessons:Record<string,Lesson>={
   "mutual-fund-fundamentals":{
