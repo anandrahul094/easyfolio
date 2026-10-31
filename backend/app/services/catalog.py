@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from threading import RLock
 from app.config import AMFI_URL, CACHE_TTL_SECONDS, REQUEST_TIMEOUT_SECONDS
 from app.repositories.base import FundRepository
@@ -12,7 +12,8 @@ class CatalogService:
 
     def status(self):
         funds = self.repository.list_funds()
-        return DataStatus(status="stale" if self.last_error and funds else ("ready" if funds else "empty"), fetched_at=self.fetched_at, latest_nav_date=self.latest_nav_date, record_count=len(funds), cache_expires_at=self.expires_at, message=self.last_error)
+        future_nav_records = sum(1 for fund in funds if fund.nav_date > date.today())
+        return DataStatus(status="stale" if self.last_error and funds else ("ready" if funds else "empty"), fetched_at=self.fetched_at, latest_nav_date=self.latest_nav_date, record_count=len(funds), future_nav_record_count=future_nav_records, cache_expires_at=self.expires_at, message=self.last_error)
 
     def refresh(self):
         with self.lock:
