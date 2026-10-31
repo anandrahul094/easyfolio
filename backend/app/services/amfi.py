@@ -80,9 +80,10 @@ def parse_feed(content: str):
         if not row:
             continue
         if len(row) == 1:
-            parsed_category, parsed_subcategory = parse_category_header(row[0])
-            if parsed_category:
-                current_category, current_subcategory = parsed_category, parsed_subcategory
+            if SECTION.match(row[0].strip()):
+                # Reset even for legacy/unknown AMFI headings so a previous
+                # section's category cannot leak into the next section.
+                current_category, current_subcategory = parse_category_header(row[0])
             continue
         if len(row) < 6 or row[0].casefold() in {"scheme code", "scheme_code"}:
             continue
