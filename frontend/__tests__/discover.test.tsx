@@ -63,7 +63,7 @@ describe("guided learning discovery flow",()=>{
     await user.click(screen.getByRole("button",{name:"See my learning route"}));
 
     await user.click(screen.getByRole("button",{name:"Start again"}));
-    expect(screen.getByText("What would you like to understand first?")).toBeInTheDocument();
+    expect(screen.getByRole("heading",{level:2,name:"What would you like to understand first?"})).toBeInTheDocument();
     expect(screen.getByRole("button",{name:"Continue →"})).toBeDisabled();
   });
 });
