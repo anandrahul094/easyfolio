@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 type Fund = { scheme_code:number; scheme_name:string; isin_growth:string; nav:string; nav_date:string; category:string|null; subcategory:string|null };
 type Result = { data:Fund[]; total:number; metadata:{latest_nav_date:string|null;future_nav_record_count:number} };
 const API = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
-const CATEGORIES = ["All categories", "Equity", "Debt", "Hybrid", "Life Cycle", "Other", "Unclassified"];
+const CATEGORIES = ["All categories", "Equity", "Debt", "Hybrid", "Life Cycle", "Solution Oriented", "Other", "Unclassified"];
 
 export default function Home() {
  const [funds,setFunds]=useState<Fund[]>([]);
