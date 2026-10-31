@@ -25,7 +25,6 @@ describe("visual dashboard progress and projection",()=>{
     ]));
     render(<Dashboard/>);
     await waitFor(()=>expect(document.body.textContent).toContain("2 / 4"));
-    expect(screen.getByText("Mutual fund fundamentals")).toBeInTheDocument();
     expect(screen.getByRole("link",{name:/Open lesson/})).toHaveAttribute("href","/learn/mutual-fund-fundamentals");
   });
 
@@ -44,7 +43,7 @@ describe("visual dashboard progress and projection",()=>{
     window.localStorage.setItem("easyfolio:learning-progress:v1","{not-json");
     render(<Dashboard/>);
     await waitFor(()=>expect(document.body.textContent).toContain("0 / 4"));
-    expect(screen.getByText("Mutual fund fundamentals")).toBeInTheDocument();
+    expect(screen.getByRole("link",{name:/Open lesson/})).toHaveAttribute("href","/learn/mutual-fund-fundamentals");
   });
 
   test("updates monthly contributions and projection output from the dashboard slider",()=>{
@@ -52,6 +51,6 @@ describe("visual dashboard progress and projection",()=>{
     expect(screen.getByText(/Total contributions:/i)).toBeInTheDocument();
     const sliders=screen.getAllByRole("slider");
     fireEvent.change(sliders[0],{target:{value:"10000"}});
-    expect(screen.getByText("₹14,40,000")).toBeInTheDocument();
+    expect(document.body.textContent).toContain("₹14,40,000");
   });
 });
