@@ -106,7 +106,7 @@ test("guided discovery completes all four educational steps and allows edits",as
   }
   await expect(page.getByRole("heading",{name:"A useful place to continue."})).toBeVisible();
   await page.getByRole("button",{name:"Change"}).first().click();
-  await expect(page.getByRole("heading",{name:"What would you like to understand first?"})).toBeVisible();
+  await expect(page.locator(".page-intro h1")).toHaveText("What would you like to understand first?");
   await expect(page.getByRole("button",{name:"How mutual funds work"})).toHaveAttribute("aria-pressed","true");
 });
 
@@ -139,7 +139,8 @@ test("comparison supports add, remove and renders available scheme facts",async(
   await expect(page.getByText("2 selected")).toBeVisible();
   await expect(page.getByRole("cell",{name:"INF000000202"})).toBeVisible();
   await page.getByRole("button",{name:"Remove Alpha Large Cap Fund"}).click();
-  await expect(page.getByRole("article",{name:"Empty scheme slot A"})).toBeVisible();
+  await expect(page.getByRole("article",{name:"Scheme A: Beta Liquid Fund"})).toBeVisible();
+  await expect(page.getByRole("article",{name:"Empty scheme slot B"})).toBeVisible();
   await expect(page.getByRole("cell",{name:"Alpha Mutual Fund"})).toHaveCount(0);
   await expect(page.getByRole("cell",{name:"Beta Asset Management"})).toBeVisible();
 });
