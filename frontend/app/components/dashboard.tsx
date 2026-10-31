@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import {useMemo,useState} from "react";
+import {useEffect,useMemo,useState} from "react";
 import {ArrowDownRight,ArrowRight,ArrowUpRight,BookOpen,ChartLine,CircleHelp,Compass,Database,GraduationCap,Layers,ShieldCheck,Sparkles,TrendingUp} from "lucide-react";
 import {calculateSip,formatInr} from "../lib/finance";
 import {AllocationRing,ProjectionCurve,ProjectionHeatmap,buildProjectionSeries} from "./visuals";
@@ -24,7 +24,13 @@ export default function Dashboard(){
   const [monthly,setMonthly]=useState(5000);
   const [rate,setRate]=useState(10);
   const [years,setYears]=useState(12);
-  const [done,setDone]=useState(1);
+  const [done,setDone]=useState(0);
+  useEffect(()=>{
+    try{
+      const saved=JSON.parse(window.localStorage.getItem("easyfolio:learning-progress:v1")??"[]");
+      if(Array.isArray(saved))setDone(Math.min(journey.length,saved.length));
+    }catch{setDone(0);}
+  },[]);
   const projection=useMemo(()=>calculateSip(monthly,rate,years),[monthly,rate,years]);
   const series=useMemo(()=>buildProjectionSeries(monthly,rate,years),[monthly,rate,years]);
   const progress=Math.round(done/journey.length*100);
@@ -102,7 +108,7 @@ export default function Dashboard(){
               <h3 className="text-sm font-bold text-white">{item.title}</h3><p className="mt-2 text-[10px] leading-5 text-slate-400">{item.desc}</p><span className="mt-3 inline-flex items-center gap-1 text-[10px] font-bold text-violet-200 group-hover:text-white">Open node <ArrowUpRight size={12}/></span>
             </Link>)}
           </div>
-          <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[.03] px-4 py-3"><div className="flex items-center gap-2 text-[11px] text-slate-300"><CircleHelp size={15} className="text-violet-200"/>Learning progress is stored locally in this browser.</div><button type="button" className="button-text" onClick={()=>setDone(value=>value===journey.length?0:journey.length)}>{done===journey.length?"Reset demo progress":"Preview completed path"}</button></div>
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[.03] px-4 py-3"><div className="flex items-center gap-2 text-[11px] text-slate-300"><CircleHelp size={15} className="text-violet-200"/>Learning progress is stored locally in this browser.</div><Link href="/learn" className="text-[10px] font-bold text-violet-200">Update learning progress <ArrowRight size={13}/></Link></div>
         </article>
       </div>
     </section>
