@@ -1,6 +1,6 @@
 import {fireEvent,render,screen,waitFor} from "@testing-library/react";
 import {LearningPath} from "../app/components/learning-path";
-import {AllocationRing,ProjectionCurve,ProjectionHeatmap,buildProjectionSeries} from "../app/components/visuals";
+import {AllocationRing,PerformanceHeatmap,ProjectionCurve,ProjectionHeatmap,buildProjectionSeries} from "../app/components/visuals";
 
 jest.mock("recharts",()=>{
   const React=require("react");
@@ -52,6 +52,23 @@ describe("visual dashboard components",()=>{
     expect(screen.getByText(/Interest-rate and credit risks apply/i)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button",{name:/Gold 5%/}));
     expect(screen.getByText("GOLD")).toBeInTheDocument();
+  });
+
+  test("historical performance heatmap clearly reports when no verified monthly data is connected",()=>{
+    render(<PerformanceHeatmap/>);
+    expect(screen.getByRole("status",{name:"Historical performance data is not connected"})).toBeInTheDocument();
+    expect(screen.getByText("Historical return data is not connected")).toBeInTheDocument();
+    expect(screen.getByText(/verified, dated performance source/i)).toBeInTheDocument();
+  });
+
+  test("historical performance heatmap renders only supplied monthly returns",()=>{
+    render(<PerformanceHeatmap data={[
+      {year:2025,month:1,returnPercent:2.35},
+      {year:2025,month:2,returnPercent:-1.2}
+    ]}/>);
+    expect(screen.getByRole("button",{name:"Jan 2025: 2.35 percent"})).toBeInTheDocument();
+    expect(screen.getByRole("button",{name:"Feb 2025: -1.20 percent"})).toBeInTheDocument();
+    expect(screen.getByText(/Select a month to inspect its return/i)).toBeInTheDocument();
   });
 
   test("scenario heatmap selects a rate and horizon and recalculates the summary",()=>{

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import {useEffect,useMemo,useState} from "react";
-import {ArrowUpRight,BookOpen,Check,LockKeyhole,RefreshCw,Sparkles} from "lucide-react";
+import {ArrowUpRight,BookOpen,Check,RefreshCw,Sparkles} from "lucide-react";
 
 type Lesson={title:string;description:string;time:string;href:string};
 const KEY="easyfolio:learning-progress:v1";
@@ -13,12 +13,12 @@ export function LearningPath({lessons}:{lessons:Lesson[]}){
   useEffect(()=>{
     try{
       const saved=JSON.parse(window.localStorage.getItem(KEY)??"[]");
-      if(Array.isArray(saved))setCompleted(saved.filter((value):value is string=>typeof value==="string"));
+      if(Array.isArray(saved))setCompleted(saved.filter((value):value is string=>typeof value==="string"&&lessons.some(lesson=>lesson.href===value)));
     }catch{setCompleted([]);}
     setReady(true);
   },[]);
   const activeIndex=useMemo(()=>lessons.findIndex(item=>!completed.includes(item.href)),[lessons,completed]);
-  const progress=Math.round(completed.length/lessons.length*100);
+  const progress=lessons.length?Math.round(completed.length/lessons.length*100):0;
   const toggle=(href:string)=>{
     const next=completed.includes(href)?completed.filter(item=>item!==href):[...completed,href];
     setCompleted(next);
@@ -30,7 +30,7 @@ export function LearningPath({lessons}:{lessons:Lesson[]}){
   };
   return <section className="bento-card mt-6" aria-labelledby="learning-path-title">
     <div className="bento-card-head">
-      <div><span className="eyebrow"><Sparkles size={12}/> GAMIFIED LEARNING PATH</span><h2 id="learning-path-title" className="mt-2">Your path to clarity</h2><p>Mark lessons as complete as you go. Progress is saved only in this browser.</p></div>
+      <div><span className="eyebrow"><Sparkles size={12}/> GAMIFIED LEARNING PATH</span><h2 id="learning-path-title" className="mt-2">Your path to clarity</h2><p>Mark lessons as complete as you go. Progress is saved only in this browser; no lesson is locked.</p></div>
       <div className="icon-chip"><BookOpen size={18}/></div>
     </div>
     <div className="mb-5 rounded-2xl border border-white/10 bg-white/[.035] p-4">
@@ -42,9 +42,9 @@ export function LearningPath({lessons}:{lessons:Lesson[]}){
       {lessons.map((lesson,index)=>{
         const isComplete=completed.includes(lesson.href);
         const isActive=index===activeIndex;
-        const isUnlocked=index===0||lessons.slice(0,index).every(item=>completed.includes(item.href));
+        const isSuggestedNext=isActive;
         return <div key={lesson.href} className={"path-node "+(isComplete?"is-complete ":isActive?"is-active ":"")}>
-          <span className="path-node-dot" aria-hidden="true">{isComplete?<Check size={17}/>:isUnlocked?<span className="text-xs font-bold">{String(index+1).padStart(2,"0")}</span>:<LockKeyhole size={15}/>}</span>
+          <span className="path-node-dot" aria-hidden="true">{isComplete?<Check size={17}/>:isSuggestedNext?<Sparkles size={15}/>:<span className="text-xs font-bold">{String(index+1).padStart(2,"0")}</span>}</span>
           <div className="min-w-0">
             <div className="path-node-title">{lesson.title}</div>
             <div className="path-node-desc">{lesson.description} · {lesson.time}</div>

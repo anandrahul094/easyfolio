@@ -4,7 +4,7 @@ import Link from "next/link";
 import {useEffect,useMemo,useState} from "react";
 import {ArrowDownRight,ArrowRight,ArrowUpRight,BookOpen,ChartLine,CircleHelp,Compass,Database,GraduationCap,Layers,ShieldCheck,Sparkles,TrendingUp} from "lucide-react";
 import {calculateSip,formatInr} from "../lib/finance";
-import {AllocationRing,ProjectionCurve,ProjectionHeatmap,buildProjectionSeries} from "./visuals";
+import {AllocationRing,PerformanceHeatmap,ProjectionCurve,ProjectionHeatmap,buildProjectionSeries} from "./visuals";
 
 const journey=[
   {title:"Mutual fund fundamentals",desc:"Understand units, fund houses and NAV.",href:"/learn/mutual-fund-fundamentals",time:"6 min"},
@@ -24,15 +24,19 @@ export default function Dashboard(){
   const [monthly,setMonthly]=useState(5000);
   const [rate,setRate]=useState(10);
   const [years,setYears]=useState(12);
-  const [done,setDone]=useState(0);
+  const [completed,setCompleted]=useState<string[]>([]);
   useEffect(()=>{
     try{
       const saved=JSON.parse(window.localStorage.getItem("easyfolio:learning-progress:v1")??"[]");
-      if(Array.isArray(saved))setDone(Math.min(journey.length,saved.length));
-    }catch{setDone(0);}
+      if(Array.isArray(saved)){
+        setCompleted(saved.filter((value):value is string=>typeof value==="string"&&journey.some(item=>item.href===value)));
+      }
+    }catch{setCompleted([]);}
   },[]);
   const projection=useMemo(()=>calculateSip(monthly,rate,years),[monthly,rate,years]);
   const series=useMemo(()=>buildProjectionSeries(monthly,rate,years),[monthly,rate,years]);
+  const done=journey.filter(item=>completed.includes(item.href)).length;
+  const nextJourney=journey.find(item=>!completed.includes(item.href));
   const progress=Math.round(done/journey.length*100);
   return <main>
     <section className="mx-auto grid max-w-[1380px] gap-5 px-5 pb-5 pt-8 lg:grid-cols-[1.05fr_.95fr] lg:px-8 lg:pt-12">
@@ -52,9 +56,9 @@ export default function Dashboard(){
         <div className="relative flex items-start justify-between gap-4"><div><span className="metric-label">YOUR LEARNING DASHBOARD</span><h2 className="mt-2 font-['Space_Grotesk'] text-2xl font-semibold text-white">Build your money map</h2><p className="mt-1 text-xs text-slate-300">A guided space to explore one idea at a time.</p></div><div className="icon-chip"><Layers size={19}/></div></div>
         <div className="relative mt-6 grid grid-cols-2 gap-3">
           <div className="rounded-2xl border border-white/10 bg-slate-950/35 p-4 backdrop-blur-xl"><span className="text-[9px] font-bold tracking-wider text-slate-400">LEARNING NODES</span><div className="mt-2 font-['Space_Grotesk'] text-3xl font-semibold text-white">{done}<span className="text-lg text-slate-500"> / 4</span></div><div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-gradient-to-r from-violet-400 to-emerald-300 transition-all duration-500" style={{width:progress+"%"}}/></div></div>
-          <div className="rounded-2xl border border-white/10 bg-slate-950/35 p-4 backdrop-blur-xl"><span className="text-[9px] font-bold tracking-wider text-slate-400">EXPLORE NEXT</span><div className="mt-2 text-sm font-semibold text-white">{journey[done%journey.length].title}</div><Link href={journey[done%journey.length].href} className="mt-2 inline-flex items-center gap-1 text-[10px] font-bold text-violet-200">Open lesson <ArrowUpRight size={12}/></Link></div>
+          <div className="rounded-2xl border border-white/10 bg-slate-950/35 p-4 backdrop-blur-xl"><span className="text-[9px] font-bold tracking-wider text-slate-400">EXPLORE NEXT</span><div className="mt-2 text-sm font-semibold text-white">{nextJourney?.title??"All foundational nodes complete"}</div><Link href={nextJourney?.href??"/learn"} className="mt-2 inline-flex items-center gap-1 text-[10px] font-bold text-violet-200">{nextJourney?"Open lesson":"Review learning path"} <ArrowUpRight size={12}/></Link></div>
         </div>
-        <div className="relative mt-5 flex items-center gap-2">{journey.map((item,index)=><span key={item.title} className={"h-2 flex-1 rounded-full transition-all duration-500 "+(index<done?"bg-emerald-300":"bg-white/15")}/>)}</div>
+        <div className="relative mt-5 flex items-center gap-2">{journey.map((item,index)=><span key={item.title} className={"h-2 flex-1 rounded-full transition-all duration-500 "+(completed.includes(item.href)?"bg-emerald-300":"bg-white/15")}/>)}</div>
         <div className="relative mt-3 flex justify-between text-[9px] font-bold uppercase tracking-wider text-slate-400"><span>Start</span><span>Build confidence</span></div>
       </div>
     </section>
@@ -103,14 +107,18 @@ export default function Dashboard(){
         <article className="bento-card bento-span-12">
           <div className="bento-card-head"><div><span className="eyebrow"><GraduationCap size={12}/> LEARNING JOURNEY</span><h2 className="mt-2">Small steps. Clearer concepts.</h2><p>Follow the learning route in order, or open the topic that interests you.</p></div><Link href="/learn" className="button-secondary">View all lessons <ArrowRight size={14}/></Link></div>
           <div className="grid gap-1 md:grid-cols-4">
-            {journey.map((item,index)=><Link key={item.title} href={item.href} className={"group rounded-2xl border p-4 transition-all duration-200 hover:-translate-y-1 "+(index<done?"border-emerald-300/20 bg-emerald-300/[.05]":"border-white/10 bg-white/[.025] hover:border-violet-200/30")}>
-              <div className="mb-3 flex items-center justify-between"><span className={"grid h-9 w-9 place-items-center rounded-full "+(index<done?"bg-emerald-300/15 text-emerald-200":"bg-violet-300/10 text-violet-200")}>{index<done?<ShieldCheck size={16}/>:<BookOpen size={16}/>}</span><span className="text-[9px] text-slate-500">{item.time}</span></div>
+            {journey.map((item,index)=><Link key={item.title} href={item.href} className={"group rounded-2xl border p-4 transition-all duration-200 hover:-translate-y-1 "+(completed.includes(item.href)?"border-emerald-300/20 bg-emerald-300/[.05]":"border-white/10 bg-white/[.025] hover:border-violet-200/30")}>
+              <div className="mb-3 flex items-center justify-between"><span className={"grid h-9 w-9 place-items-center rounded-full "+(completed.includes(item.href)?"bg-emerald-300/15 text-emerald-200":"bg-violet-300/10 text-violet-200")}>{completed.includes(item.href)?<ShieldCheck size={16}/>:<BookOpen size={16}/>}</span><span className="text-[9px] text-slate-500">{item.time}</span></div>
               <h3 className="text-sm font-bold text-white">{item.title}</h3><p className="mt-2 text-[10px] leading-5 text-slate-400">{item.desc}</p><span className="mt-3 inline-flex items-center gap-1 text-[10px] font-bold text-violet-200 group-hover:text-white">Open node <ArrowUpRight size={12}/></span>
             </Link>)}
           </div>
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[.03] px-4 py-3"><div className="flex items-center gap-2 text-[11px] text-slate-300"><CircleHelp size={15} className="text-violet-200"/>Learning progress is stored locally in this browser.</div><Link href="/learn" className="text-[10px] font-bold text-violet-200">Update learning progress <ArrowRight size={13}/></Link></div>
         </article>
       </div>
+      <article className="bento-card mt-4">
+        <div className="bento-card-head"><div><span className="eyebrow">HISTORICAL PERFORMANCE</span><h2 className="mt-2">Monthly return heatmap</h2><p>A compact view of positive and negative months, populated only from verified performance records.</p></div><div className="icon-chip"><ChartLine size={18}/></div></div>
+        <PerformanceHeatmap/>
+      </article>
     </section>
 
     <section className="mx-auto max-w-[1380px] px-5 pb-10 lg:px-8"><div className="flex flex-wrap items-center justify-between gap-4 rounded-[24px] border border-violet-200/15 bg-gradient-to-r from-violet-500/15 via-indigo-500/10 to-cyan-400/10 p-6 sm:p-8"><div><span className="eyebrow">READY FOR THE NEXT STEP?</span><h2 className="mt-2 font-['Space_Grotesk'] text-2xl font-semibold text-white">Turn curiosity into understanding.</h2><p className="mt-2 max-w-xl text-xs leading-6 text-slate-300">Use the guided discovery route to find the right learning topics for your questions — not an investment recommendation.</p></div><Link href="/discover" className="button-primary"><Compass size={15}/> Find your starting point</Link></div></section>

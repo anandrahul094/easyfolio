@@ -170,6 +170,8 @@ test("Bento dashboard allocation ring and scenario heatmap respond to interactio
   await expect(page.getByText("Illustrative allocation only. This is not a real mutual fund portfolio or a suggested asset mix.")).toBeVisible();
   await page.getByRole("button",{name:/Debt 30%/}).hover();
   await expect(page.locator(".donut-center")).toContainText("DEBT");
+  await expect(page.getByRole("heading",{name:"Monthly return heatmap"})).toBeVisible();
+  await expect(page.getByText("Historical return data is not connected")).toBeVisible();
   const scenario=page.getByRole("button",{name:/Assumed annual rate 5 percent over 5 years/});
   await scenario.click();
   await expect(scenario).toHaveAttribute("aria-pressed","true");
