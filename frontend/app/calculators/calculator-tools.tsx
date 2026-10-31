@@ -53,7 +53,7 @@ export function SipCalculator(){
         <div className="mt-5"><ProjectionResult invested={result.investedAmount} future={result.futureValue} growth={result.growth}/></div>
       </section>
     </div>
-    <div className="mt-6"><Note title="What this calculation assumes"><p>End-of-month instalments and monthly compounding of the assumed annual rate. Actual investment returns vary and may be negative. A SIP does not guarantee returns or eliminate market risk.</p></Note></div>
+    <div className="mt-6"><Note title="An illustration is not a forecast"><p>End-of-month instalments and monthly compounding of the assumed annual rate. Actual investment returns vary and may be negative. A SIP does not guarantee returns or eliminate market risk.</p></Note></div>
   </main>;
 }
 

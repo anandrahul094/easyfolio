@@ -33,7 +33,7 @@ export default function Learn(){
     <section className="mt-7 grid gap-4 md:grid-cols-2">
       {lessons.map(([number,title,description,time,slug])=><article key={slug} className="bento-card flex items-start gap-4">
         <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-violet-200/15 bg-violet-300/10 font-['Space_Grotesk'] text-sm font-bold text-violet-200">{number}</span>
-        <div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><h2 className="font-['Space_Grotesk'] text-base font-semibold text-white">{title}</h2><span className="inline-flex items-center gap-1 text-[9px] text-slate-400"><Clock3 size={11}/>{time}</span></div><p className="mt-2 text-xs leading-6 text-slate-400">{description}</p><Link href={"/learn/"+slug} className="text-link">Open lesson <ArrowRight size={13}/></Link></div>
+        <div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><h2 className="font-['Space_Grotesk'] text-base font-semibold text-white">{title}</h2><span className="inline-flex items-center gap-1 text-[9px] text-slate-400"><Clock3 size={11}/>{time}</span></div><p className="mt-2 text-xs leading-6 text-slate-400">{description}</p><Link href={"/learn/"+slug} className="text-link">Read lesson <ArrowRight size={13}/></Link></div>
       </article>)}
     </section>
     <div className="mt-7"><Note title="Learning progress stays private"><p>Milestones are stored in local browser storage only. There is no account tracking or public leaderboard.</p></Note></div>

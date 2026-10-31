@@ -14,16 +14,17 @@ jest.mock("next/link",()=>({
 describe("public learning and information screens",()=>{
   test("homepage introduces the product and exposes the main journeys",()=>{
     render(<Home/>);
-    expect(screen.getByRole("heading",{level:1,name:/Understand money.*Invest with more clarity/i})).toBeInTheDocument();
-    expect(screen.getByRole("link",{name:/Start learning/i})).toHaveAttribute("href","/learn");
-    expect(screen.getByRole("link",{name:/Explore mutual funds/i})).toHaveAttribute("href","/funds");
-    expect(screen.getByRole("link",{name:/Find my starting point/i})).toHaveAttribute("href","/discover");
-    expect(screen.getByRole("link",{name:/View full glossary/i})).toHaveAttribute("href","/glossary");
+    expect(screen.getByRole("heading",{level:1,name:/See the bigger picture.*Learn as you go/i})).toBeInTheDocument();
+    expect(screen.getByRole("link",{name:/Continue learning/i})).toHaveAttribute("href","/learn");
+    expect(screen.getByRole("link",{name:/Explore schemes/i})).toHaveAttribute("href","/funds");
+    expect(screen.getByRole("link",{name:/Find your starting point/i})).toHaveAttribute("href","/discover");
+    expect(screen.getByRole("heading",{name:"Asset allocation ring"})).toBeInTheDocument();
+    expect(screen.getByRole("heading",{name:"Projection sensitivity map"})).toBeInTheDocument();
   });
 
   test("learning centre exposes six distinct lesson destinations",()=>{
     render(<Learn/>);
-    expect(screen.getByRole("heading",{level:1,name:"Build knowledge, one idea at a time."})).toBeInTheDocument();
+    expect(screen.getByRole("heading",{level:1,name:"Build knowledge, one node at a time."})).toBeInTheDocument();
     const lessonLinks=screen.getAllByRole("link",{name:/Read lesson/i});
     expect(lessonLinks).toHaveLength(6);
     expect(lessonLinks.map(link=>link.getAttribute("href"))).toEqual([
