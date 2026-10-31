@@ -13,12 +13,38 @@ jest.mock("recharts",()=>{
     Pie:Container,
     CartesianGrid:Empty,
     Cell:Empty,
-    Area:Empty,
+    Area:({isAnimationActive}: {isAnimationActive?:boolean})=>React.createElement("div",{"data-testid":"chart-area","data-animation-active":String(Boolean(isAnimationActive))}),
     Tooltip:Empty,
     XAxis:Empty,
     YAxis:Empty,
     Legend:Empty
   };
+  test("projection curve reveals immediately when IntersectionObserver is unavailable",async()=>{
+    const original=global.IntersectionObserver;
+    Object.defineProperty(global,"IntersectionObserver",{configurable:true,writable:true,value:undefined});
+    try{
+      const data=buildProjectionSeries(1000,8,2);
+      const {container}=render(<ProjectionCurve data={data}/>);
+      await waitFor(()=>expect(container.querySelector(".reveal-chart")).toBeInTheDocument());
+    }finally{
+      Object.defineProperty(global,"IntersectionObserver",{configurable:true,writable:true,value:original});
+    }
+  });
+
+  test("projection curve disables chart animation when reduced motion is preferred",async()=>{
+    const original=window.matchMedia;
+    Object.defineProperty(window,"matchMedia",{configurable:true,writable:true,value:jest.fn().mockReturnValue({
+      matches:true,media:"(prefers-reduced-motion: reduce)",addEventListener:jest.fn(),removeEventListener:jest.fn()
+    })});
+    try{
+      render(<ProjectionCurve data={buildProjectionSeries(1000,8,2)}/>);
+      await waitFor(()=>expect(screen.getAllByTestId("chart-area").length).toBeGreaterThan(0));
+      expect(screen.getAllByTestId("chart-area").every(node=>node.getAttribute("data-animation-active")==="false")).toBe(true);
+    }finally{
+      Object.defineProperty(window,"matchMedia",{configurable:true,writable:true,value:original});
+    }
+  });
+
 });
 
 const lessons=[
@@ -52,6 +78,8 @@ describe("visual dashboard components",()=>{
     expect(screen.getByText(/Interest-rate and credit risks apply/i)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button",{name:/Gold 5%/}));
     expect(screen.getByText("GOLD")).toBeInTheDocument();
+    fireEvent.focus(screen.getByRole("button",{name:/Equity 55%/}));
+    expect(screen.getByText("EQUITY")).toBeInTheDocument();
   });
 
   test("historical performance heatmap clearly reports when no verified monthly data is connected",()=>{
@@ -64,11 +92,16 @@ describe("visual dashboard components",()=>{
   test("historical performance heatmap renders only supplied monthly returns",()=>{
     render(<PerformanceHeatmap data={[
       {year:2025,month:1,returnPercent:2.35},
-      {year:2025,month:2,returnPercent:-1.2}
+      {year:2025,month:2,returnPercent:-1.2},
+      {year:2025,month:3,returnPercent:0}
     ]}/>);
-    expect(screen.getByRole("button",{name:"Jan 2025: 2.35 percent"})).toBeInTheDocument();
+    const january=screen.getByRole("button",{name:"Jan 2025: 2.35 percent"});
+    expect(january).toBeInTheDocument();
     expect(screen.getByRole("button",{name:"Feb 2025: -1.20 percent"})).toBeInTheDocument();
+    expect(screen.getByRole("button",{name:"Mar 2025: 0.00 percent"})).toBeInTheDocument();
     expect(screen.getByText(/Select a month to inspect its return/i)).toBeInTheDocument();
+    fireEvent.click(january);
+    expect(screen.getByText("Jan 2025: 2.35% Historical values require a source and reporting date.")).toBeInTheDocument();
   });
 
   test("scenario heatmap selects a rate and horizon and recalculates the summary",()=>{
@@ -78,6 +111,9 @@ describe("visual dashboard components",()=>{
     expect(cell).toHaveAttribute("aria-pressed","true");
     expect(screen.getByText("5% · 5 years")).toBeInTheDocument();
     expect(screen.getByText("Selected growth relative to contributions: 13.3%. Hypothetical scenarios using monthly end-of-month contributions of ₹2,500. These are calculator outputs, not historical fund returns or forecasts.")).toBeInTheDocument();
+    const negativeScenario=screen.getByRole("button",{name:/Assumed annual rate -10 percent over 1 years/});
+    fireEvent.focus(negativeScenario);
+    expect(negativeScenario).toHaveAttribute("aria-pressed","true");
   });
 
   test("learning path loads, persists, completes and resets local milestones",async()=>{
