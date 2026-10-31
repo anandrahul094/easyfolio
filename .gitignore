@@ -6,3 +6,5 @@ __pycache__/
 !.env.example
 node_modules/
 .next/
+frontend/test-results/
+frontend/playwright-report/

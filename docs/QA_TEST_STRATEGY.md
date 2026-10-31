@@ -39,6 +39,12 @@ Every feature follows Red → Green → Refactor:
 - **Risk assessment:** No risk-scoring or Riskometer mapping implementation exists. The AMFI NAV feed does not provide sufficient information to derive Low/Medium/High risk. Use current scheme risk disclosures or approve a sourced methodology before implementing and testing a risk model.
 - **Zerodha redirection:** No Zerodha transaction/redirect code or approved destination contract exists. Define the integration and approved URL/identifier contract before testing HTTPS allowlisting, encoded parameters, scheme mapping and safe external navigation.
 
+## Browser end-to-end coverage
+
+Playwright Test runs the built Next.js app in two Chromium projects: a 1440px desktop viewport and a 390px mobile viewport. The suite smoke-tests all 18 public routes and exercises lesson navigation, guided discovery, fund search/filtering, comparison selection/removal, SIP and compound calculators, glossary search, mobile quick navigation and horizontal overflow. AMFI requests are intercepted with fixed test records; CI never depends on a live market-data feed. Failure screenshots, video and traces are retained as a 7-day GitHub Actions artifact.
+
+Current browser run: 49 passed, 1 expected desktop-only skip. The desktop-only skip is the mobile navigation/overflow assertion, which runs in the mobile Chromium project.
+
 ## Commands
 
 Backend (from backend/):
@@ -56,4 +62,6 @@ Frontend (from frontend/):
 npm install
 npm run test:coverage -- --runInBand
 npm run build
+npx playwright install chromium
+npm run test:e2e
 ```
