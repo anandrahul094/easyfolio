@@ -23,6 +23,12 @@ Example Mutual Fund
 Open Ended Schemes(Other Scheme - FoF Domestic)
 Example Mutual Fund
 100106;INF000000107;-;Example Fund of Funds;Direct Plan;Growth;11.0000;30-Oct-2026
+Open Ended Schemes(Solution Oriented Scheme - Retirement Fund)
+Example Mutual Fund
+100108;INF000000109;-;Example Retirement Fund;Direct Plan;Growth;13.0000;30-Oct-2026
+Open Ended Schemes(Solution Oriented Scheme - Childrens Fund)
+Example Mutual Fund
+100109;INF000000110;-;Example Childrens Fund;Direct Plan;Growth;14.0000;30-Oct-2026
 Open Ended Schemes(Children’s Fund - Childrens' Fund)
 Example Mutual Fund
 100107;INF000000108;-;Example Children's Fund;Direct Plan;Growth;12.0000;30-Oct-2026
@@ -41,12 +47,14 @@ def test_direct_growth_filter_legacy_format():
 def test_current_amfi_category_headers_and_plan_filter():
     funds, stats = parse_feed(CURRENT_SAMPLE)
     by_code = {fund.scheme_code: fund for fund in funds}
-    assert set(by_code) == {100101, 100103, 100104, 100105, 100106, 100107}
+    assert set(by_code) == {100101, 100103, 100104, 100105, 100106, 100107, 100108, 100109}
     assert (by_code[100101].category, by_code[100101].subcategory) == ("Equity", "Large Cap Fund")
     assert (by_code[100103].category, by_code[100103].subcategory) == ("Debt", "Liquid Fund")
     assert by_code[100104].category == "Hybrid"
     assert by_code[100105].category == "Life Cycle"
     assert by_code[100106].category == "Other"
+    assert (by_code[100108].category, by_code[100108].subcategory) == ("Solution Oriented", "Retirement Fund")
+    assert (by_code[100109].category, by_code[100109].subcategory) == ("Solution Oriented", "Childrens Fund")
     assert by_code[100107].category is None
     assert by_code[100107].subcategory is None
-    assert stats["rows_seen"] == 7
+    assert stats["rows_seen"] == 9
