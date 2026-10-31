@@ -6,7 +6,7 @@ const customJestConfig = {
   clearMocks:true,
   testEnvironment:"jsdom",
   setupFilesAfterEnv:["<rootDir>/jest.setup.ts"],
-  testPathIgnorePatterns:["<rootDir>/.next/","<rootDir>/node_modules/"],
+  testPathIgnorePatterns:["<rootDir>/.next/","<rootDir>/node_modules/","<rootDir>/e2e/"],
   collectCoverageFrom:["app/**/*.{ts,tsx}","!app/**/*.d.ts","!app/layout.tsx"],
   coverageProvider:"v8",
   coverageReporters:["text","lcov"],
