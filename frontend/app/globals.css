@@ -1,7 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 :root{--night:#0b1023;--panel:rgba(21,28,55,.74);--line:rgba(208,214,255,.12);--ink:#f5f6ff;--muted:#aab2d0;--purple:#9177ff;--green:#39d9a1;--red:#fb7185;--gold:#ffc978;--shadow:0 24px 70px rgba(2,6,23,.34)}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:96px}

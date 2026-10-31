@@ -50,7 +50,7 @@ async function mockSchemeApi(page:Page){
 }
 
 const coreRoutes=[
-  ["/","Understand money."],
+  ["/","See the bigger picture."],
   ["/learn","Build knowledge"],
   ["/learn/mutual-fund-fundamentals","Mutual fund fundamentals"],
   ["/learn/sip-explained","SIP, explained simply"],
@@ -162,6 +162,18 @@ test("SIP and compound calculators expose their assumptions and update results",
   await page.getByLabel("Compounding frequency").selectOption("12");
   await expect(compoundResult).toContainText("Monthly");
   await expect(compoundResult).toContainText("ILLUSTRATIVE FUTURE VALUE");
+});
+
+test("Bento dashboard allocation ring and scenario heatmap respond to interaction",async({page})=>{
+  await page.goto("/");
+  await expect(page.getByRole("heading",{name:"Asset allocation ring"})).toBeVisible();
+  await expect(page.getByText("Illustrative allocation only. This is not a real mutual fund portfolio or a suggested asset mix.")).toBeVisible();
+  await page.getByRole("button",{name:/Debt 30%/}).hover();
+  await expect(page.locator(".donut-center")).toContainText("DEBT");
+  const scenario=page.getByRole("button",{name:/Assumed annual rate 5 percent over 5 years/});
+  await scenario.click();
+  await expect(scenario).toHaveAttribute("aria-pressed","true");
+  await expect(page.getByText("5% · 5 years")).toBeVisible();
 });
 
 test("glossary search returns matching terms and a useful empty state",async({page})=>{
