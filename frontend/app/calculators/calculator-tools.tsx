@@ -86,6 +86,6 @@ export function CompoundCalculator(){
         <div className="mt-5"><ProjectionResult invested={result.investedAmount} future={result.futureValue} growth={result.growth}/></div>
       </section>
     </div>
-    <div className="mt-6"><Note title="Compounding describes a formula, not a guaranteed outcome"><p>Actual market-linked investment returns are uneven and may be negative. This calculator does not represent returns of any mutual fund or asset class. Fees, taxes and inflation are excluded.</p></Note></div>
+    <div className="mt-6"><Note title="Compounding describes a formula — not a guaranteed outcome"><p>Actual market-linked investment returns are uneven and may be negative. This calculator does not represent returns of any mutual fund or asset class. Fees, taxes and inflation are excluded.</p></Note></div>
   </main>;
 }

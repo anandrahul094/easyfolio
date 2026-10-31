@@ -11,7 +11,7 @@ describe("calculator screen interactions",()=>{
     expect(result).toBeInTheDocument();
     fireEvent.change(sliders[0],{target:{value:"10000"}});
     expect(screen.getByText("₹20,48,450")).toBeInTheDocument();
-    expect(screen.getByText("₹12,00,000")).toBeInTheDocument();
+    expect(screen.getAllByText("₹12,00,000")).toHaveLength(2);
   });
 
   test("compound calculator changes output when compounding frequency changes",()=>{
