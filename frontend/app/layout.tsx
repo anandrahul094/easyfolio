@@ -1,4 +1,28 @@
-import type {Metadata} from "next";import Link from "next/link";import "./globals.css";
-export const metadata:Metadata={title:{default:"EasyFolio — Mutual funds, made easier",template:"%s | EasyFolio"},description:"Learn mutual fund basics, understand risk and explore Indian mutual fund schemes using AMFI-published NAV information.",metadataBase:new URL("https://easyfolio-beta.vercel.app")};
-const nav=[["/learn","Learn"],["/basics","Investing basics"],["/categories","Categories"],["/funds","Explore funds"],["/compare","Compare"],["/calculators/sip","Calculators"],["/glossary","Glossary"]];
-export default function RootLayout({children}:{children:React.ReactNode}){return <html lang="en"><body><a href="#main-content" className="skip-link">Skip to content</a><header className="site-header"><div className="nav-wrap"><Link href="/" className="brand" aria-label="EasyFolio home"><span className="brand-mark">e</span>easyfolio<span style={{color:"#c99a4b"}}>.</span></Link><nav className="desktop-nav" aria-label="Main navigation">{nav.map(([href,label])=><Link key={href} href={href}>{label}</Link>)}</nav><Link href="/discover" className="nav-cta">Find your starting point ↗</Link></div></header><div id="main-content">{children}</div><nav className="mobile-bottom-nav" aria-label="Quick navigation"><Link href="/"><span>⌂</span>Home</Link><Link href="/learn"><span>▤</span>Learn</Link><Link href="/funds"><span>◫</span>Funds</Link><Link href="/calculators/sip"><span>⌁</span>Tools</Link></nav><footer className="site-footer"><div className="footer-inner"><div><Link href="/" className="footer-brand">easyfolio.</Link><p style={{marginTop:8}}>A clearer way to learn about money.</p></div><div className="footer-links"><Link href="/learn">Learning centre</Link><Link href="/funds">Explore funds</Link><Link href="/resources">Resources</Link><Link href="/glossary">Glossary</Link><Link href="/about">About</Link></div><p className="disclaimer">EasyFolio is an educational and research tool, not investment advice. Mutual fund investments are subject to market risks. Read all scheme-related documents carefully. Scheme information and NAV are shown with their source and date; verify details with the relevant AMC before making an investment decision.</p></div></footer></body></html>}
+import type {Metadata} from "next";
+import Link from "next/link";
+import "./globals.css";
+import {MobileBottomNav,SiteHeader} from "./site-navigation";
+
+export const metadata:Metadata={
+  title:{default:"EasyFolio — Mutual funds, made easier",template:"%s | EasyFolio"},
+  description:"Learn mutual fund basics, understand risk and explore Indian mutual fund schemes using AMFI-published NAV information.",
+  metadataBase:new URL("https://easyfolio-beta.vercel.app")
+};
+
+export default function RootLayout({children}:{children:React.ReactNode}){
+  return <html lang="en"><body>
+    <a href="#main-content" className="skip-link">Skip to content</a>
+    <SiteHeader/>
+    <div id="main-content">{children}</div>
+    <MobileBottomNav/>
+    <footer className="site-footer">
+      <div className="footer-inner">
+        <div><Link href="/" className="footer-brand">easyfolio.</Link><p style={{marginTop:8}}>A clearer way to learn about money.</p></div>
+        <nav className="footer-links" aria-label="Footer navigation">
+          <Link href="/learn">Learning centre</Link><Link href="/basics">Investing basics</Link><Link href="/categories">Categories</Link><Link href="/funds">Explore funds</Link><Link href="/compare">Compare</Link><Link href="/calculators/sip">Calculators</Link><Link href="/discover">Guided discovery</Link><Link href="/resources">Resources</Link><Link href="/glossary">Glossary</Link><Link href="/about">About</Link>
+        </nav>
+        <p className="disclaimer">EasyFolio is an educational and research tool, not investment advice. Mutual fund investments are subject to market risks. Read all scheme-related documents carefully. Scheme information and NAV are shown with their source and date; verify details with the relevant AMC before making an investment decision.</p>
+      </div>
+    </footer>
+  </body></html>;
+}
