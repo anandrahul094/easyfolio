@@ -50,7 +50,7 @@ async function mockSchemeApi(page:Page){
 }
 
 const coreRoutes=[
-  ["/","Understand money."],
+  ["/","See the bigger picture."],
   ["/learn","Build knowledge"],
   ["/learn/mutual-fund-fundamentals","Mutual fund fundamentals"],
   ["/learn/sip-explained","SIP, explained simply"],
@@ -133,16 +133,16 @@ test("comparison supports add, remove and renders available scheme facts",async(
   await search.fill("Alpha");
   await page.getByRole("button",{name:"Add Alpha Large Cap Fund"}).click();
   await expect(page.getByRole("article",{name:"Scheme A: Alpha Large Cap Fund"})).toBeVisible();
-  await expect(page.getByRole("cell",{name:"Alpha Mutual Fund"})).toBeVisible();
+  await expect(page.getByText("Alpha Mutual Fund")).toBeVisible();
   await search.fill("Beta");
   await page.getByRole("button",{name:"Add Beta Liquid Fund"}).click();
   await expect(page.getByText("2 selected")).toBeVisible();
-  await expect(page.getByRole("cell",{name:"INF000000202"})).toBeVisible();
+  await expect(page.getByText("INF000000202")).toBeVisible();
   await page.getByRole("button",{name:"Remove Alpha Large Cap Fund"}).click();
   await expect(page.getByRole("article",{name:"Scheme A: Beta Liquid Fund"})).toBeVisible();
   await expect(page.getByRole("article",{name:"Empty scheme slot B"})).toBeVisible();
-  await expect(page.getByRole("cell",{name:"Alpha Mutual Fund"})).toHaveCount(0);
-  await expect(page.getByRole("cell",{name:"Beta Asset Management"})).toBeVisible();
+  await expect(page.getByText("Alpha Mutual Fund")).toHaveCount(0);
+  await expect(page.getByText("Beta Asset Management")).toBeVisible();
 });
 
 test("SIP and compound calculators expose their assumptions and update results",async({page})=>{
@@ -162,6 +162,20 @@ test("SIP and compound calculators expose their assumptions and update results",
   await page.getByLabel("Compounding frequency").selectOption("12");
   await expect(compoundResult).toContainText("Monthly");
   await expect(compoundResult).toContainText("ILLUSTRATIVE FUTURE VALUE");
+});
+
+test("Bento dashboard allocation ring and scenario heatmap respond to interaction",async({page})=>{
+  await page.goto("/");
+  await expect(page.getByRole("heading",{name:"Asset allocation ring"})).toBeVisible();
+  await expect(page.getByText("Illustrative allocation only. This is not a real mutual fund portfolio or a suggested asset mix.")).toBeVisible();
+  await page.getByRole("button",{name:/Debt 30%/}).hover();
+  await expect(page.locator(".donut-center")).toContainText("DEBT");
+  await expect(page.getByRole("heading",{name:"Monthly return heatmap"})).toBeVisible();
+  await expect(page.getByText("Historical return data is not connected")).toBeVisible();
+  const scenario=page.getByRole("button",{name:/Assumed annual rate 5 percent over 5 years/});
+  await scenario.click();
+  await expect(scenario).toHaveAttribute("aria-pressed","true");
+  await expect(page.getByText("5% · 5 years")).toBeVisible();
 });
 
 test("glossary search returns matching terms and a useful empty state",async({page})=>{
