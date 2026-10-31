@@ -1,7 +1,14 @@
 from typing import Protocol
 from app.models import Fund
 
+
 class FundRepository(Protocol):
     def replace_snapshot(self, funds: list[Fund]) -> None: ...
-    def list_funds(self, query: str | None = None, category: str | None = None, beginner_tag: str | None = None) -> list[Fund]: ...
+    def list_funds(
+        self,
+        query: str | None = None,
+        category: str | None = None,
+        beginner_tag: str | None = None,
+        subcategory: str | None = None,
+    ) -> list[Fund]: ...
     def get_fund(self, scheme_code: int) -> Fund | None: ...

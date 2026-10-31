@@ -1,0 +1,7 @@
+Scheme Code;ISIN Div Payout/ ISIN Growth;ISIN Div Reinvestment;Scheme Name;Plan;Option;Net Asset Value;Date
+Open Ended Schemes(Equity Scheme - Large Cap Fund)
+Acme Mutual Fund
+100201;INF000000201;-;  Acme   Large Cap   Fund  ;Direct Plan;Growth Option;1,234.5678;30-Oct-2026
+Open Ended Schemes(Debt Scheme - Liquid Fund)
+Beta Asset Management
+100202;INF000000202;-;Beta Liquid Fund;Direct Plan;Growth Option;12.3400;30-Oct-2026

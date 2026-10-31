@@ -56,6 +56,11 @@ def parse_nav_date(value: str):
     raise ValueError(f"Unsupported NAV date: {value}")
 
 
+def normalize_text(value: str) -> str:
+    """Trim feed text and collapse runs of whitespace into one readable space."""
+    return re.sub(r"\s+", " ", value).strip()
+
+
 def parse_category_header(line: str):
     match = SECTION.match(line.strip())
     if not match:
@@ -76,22 +81,31 @@ def parse_feed(content: str):
     reader = csv.reader(io.StringIO(content), delimiter=";")
     funds, rejected, rows_seen = {}, 0, 0
     current_category, current_subcategory = None, None
+    current_amc = None
+    awaiting_amc_name = False
 
     for row in reader:
         row = [cell.strip() for cell in row]
         if not row:
             continue
         if len(row) == 1:
-            if SECTION.match(row[0].strip()):
-                # Reset even for legacy/unknown AMFI headings so a previous
-                # section's category cannot leak into the next section.
+            section_match = SECTION.match(row[0].strip())
+            if section_match:
+                # A current-format AMFI section is followed by its fund-house
+                # name. Reset context at each new section to prevent leakage.
                 current_category, current_subcategory = parse_category_header(row[0])
+                current_amc = None
+                awaiting_amc_name = True
+            elif awaiting_amc_name:
+                current_amc = normalize_text(row[0]) or None
+                awaiting_amc_name = False
             continue
         if len(row) < 6 or row[0].casefold() in {"scheme code", "scheme_code"}:
             continue
 
         try:
-            code, isin, name = int(row[0]), row[1], row[3]
+            code, isin = int(row[0]), row[1]
+            name = normalize_text(row[3])
             if len(row) >= 8:
                 plan, option = row[4], row[5]
                 nav_value, date_value = row[6], row[7]
@@ -112,6 +126,7 @@ def parse_feed(content: str):
                 scheme_code=code, isin_growth=isin, scheme_name=name,
                 nav=nav, nav_date=nav_date,
                 category=current_category, subcategory=current_subcategory,
+                amc_name=current_amc,
             )
         except (ValueError, InvalidOperation, IndexError):
             rejected += 1

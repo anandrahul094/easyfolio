@@ -1,10 +1,88 @@
 "use client";
-import {useEffect,useState} from "react";import Link from "next/link";import {PageIntro,Note,Pill} from "../ui";
-type Fund={scheme_code:number;scheme_name:string;nav:string|number;nav_date:string;isin_growth:string;category:string|null;subcategory:string|null;plan?:string;option?:string;amc_name?:string|null};
+import {useEffect,useState} from "react";
+import Link from "next/link";
+import {PageIntro,Note,Pill} from "../ui";
+import {SchemePicker,type ComparableFund} from "./scheme-picker";
+
 const API=process.env.NEXT_PUBLIC_API_BASE_URL??"http://localhost:8000";
-export default function Compare(){const[q,setQ]=useState(""),[results,setResults]=useState<Fund[]>([]),[selected,setSelected]=useState<Fund[]>([]),[busy,setBusy]=useState(false),[error,setError]=useState("");
-useEffect(()=>{const id=new URLSearchParams(window.location.search).get("scheme");if(id)fetch(API+"/api/v1/schemes/"+id).then(r=>r.ok?r.json():null).then(v=>{if(v?.data)setSelected([v.data])}).catch(()=>{});},[]);
-useEffect(()=>{if(q.trim().length<2){setResults([]);return;}const c=new AbortController(),t=setTimeout(async()=>{setBusy(true);try{const r=await fetch(API+"/api/v1/schemes?q="+encodeURIComponent(q)+"&limit=20",{signal:c.signal});if(!r.ok)throw Error("Search unavailable");const d=await r.json();setResults(d.data??[]);setError("");}catch(e){if(!c.signal.aborted)setError(e instanceof Error?e.message:"Unable to search.");}finally{if(!c.signal.aborted)setBusy(false);}},250);return()=>{clearTimeout(t);c.abort();};},[q]);
-const add=(f:Fund)=>{if(!selected.some(x=>x.scheme_code===f.scheme_code)&&selected.length<3)setSelected([...selected,f]);setQ("");setResults([]);},remove=(id:number)=>setSelected(selected.filter(f=>f.scheme_code!==id));
-const metrics:[string,(f:Fund)=>string][]=[["Scheme name",f=>f.scheme_name],["AMC",f=>f.amc_name??"Not supplied"],["Category",f=>f.category??"Unclassified"],["Subcategory",f=>f.subcategory??"Not supplied"],["Plan / option",f=>(f.plan??"Direct")+" · "+(f.option??"Growth")],["Latest NAV",f=>"₹"+Number(f.nav).toLocaleString("en-IN",{maximumFractionDigits:4})],["NAV date",f=>f.nav_date],["Scheme code",f=>String(f.scheme_code)],["ISIN Growth",f=>f.isin_growth]];
-return <main className="page-shell"><PageIntro eyebrow="SIDE-BY-SIDE RESEARCH" title="Compare with context, not rankings." description="Compare scheme facts that are available and comparable. This view explains differences; it does not declare a universal winner."/><section className="content-card"><label htmlFor="compare-search" className="micro-label">ADD A DIRECT GROWTH SCHEME (UP TO 3)</label><input id="compare-search" className="field" style={{marginTop:9}} value={q} onChange={e=>setQ(e.target.value)} placeholder="Search scheme name or code"/>{busy&&<p className="small-muted">Searching schemes…</p>}{error&&<p className="error-state">{error}</p>}{results.length>0&&<div style={{display:"grid",gap:6,marginTop:8}}>{results.map(f=><button key={f.scheme_code} className="wizard-option" onClick={()=>add(f)} disabled={selected.length>=3||selected.some(x=>x.scheme_code===f.scheme_code)}>{f.scheme_name} <span className="small-muted">· {f.scheme_code}</span></button>)}</div>}<div className="compare-controls" style={{marginTop:18}}>{[0,1,2].map(i=><div className="content-card" key={i}><span className="micro-label">SCHEME {String.fromCharCode(65+i)}</span>{selected[i]?<><p style={{fontSize:12,fontWeight:800,marginTop:12}}>{selected[i].scheme_name}</p><button className="button-text" onClick={()=>remove(selected[i].scheme_code)}>Remove</button></>:<p className="small-muted" style={{marginTop:12}}>Search above to add a scheme.</p>}</div>)}</div></section>{selected.length>0&&<><div className="results-head"><h2>Available scheme information</h2><Pill>{selected.length} selected</Pill></div><div className="compare-table-wrap"><table className="compare-table"><thead><tr><th>INFORMATION</th>{selected.map(f=><th key={f.scheme_code}>{f.scheme_name}</th>)}</tr></thead><tbody>{metrics.map(([label,get])=><tr key={label}><td>{label}</td>{selected.map(f=><td key={f.scheme_code}>{get(f)}</td>)}</tr>)}</tbody></table></div></>}<div style={{marginTop:24}}><Note title="Metrics not yet in the data source"><p>Expense ratio, AUM, benchmark, Riskometer, portfolio holdings and historical returns are not supplied by the current AMFI NAV API. They should remain unavailable until separately verified, dated sources are integrated.</p></Note></div><p className="small-muted" style={{marginTop:18}}>Need to browse first? <Link className="text-link" href="/funds">Open the fund explorer →</Link></p></main>}
+
+export default function Compare(){
+  const [query,setQuery]=useState("");
+  const [results,setResults]=useState<ComparableFund[]>([]);
+  const [selected,setSelected]=useState<ComparableFund[]>([]);
+  const [busy,setBusy]=useState(false);
+  const [error,setError]=useState("");
+
+  useEffect(()=>{
+    const id=new URLSearchParams(window.location.search).get("scheme");
+    if(!id) return;
+    const controller=new AbortController();
+    fetch(API+"/api/v1/schemes/"+encodeURIComponent(id),{signal:controller.signal})
+      .then(response=>response.ok?response.json():null)
+      .then(value=>{if(value?.data)setSelected([value.data]);})
+      .catch(()=>{});
+    return ()=>controller.abort();
+  },[]);
+
+  useEffect(()=>{
+    if(query.trim().length<2){setResults([]);return;}
+    const controller=new AbortController();
+    const timer=setTimeout(async()=>{
+      setBusy(true);
+      setError("");
+      try{
+        const response=await fetch(API+"/api/v1/schemes?q="+encodeURIComponent(query.trim())+"&limit=20",{signal:controller.signal});
+        if(!response.ok) throw new Error("Search unavailable");
+        const body=await response.json();
+        setResults(body.data??[]);
+      }catch(caught){
+        if(!controller.signal.aborted) setError(caught instanceof Error?caught.message:"Unable to search.");
+      }finally{
+        if(!controller.signal.aborted) setBusy(false);
+      }
+    },250);
+    return ()=>{clearTimeout(timer);controller.abort();};
+  },[query]);
+
+  const add=(fund:ComparableFund)=>{
+    setSelected(current=>{
+      if(current.length>=3||current.some(item=>item.scheme_code===fund.scheme_code)) return current;
+      return [...current,fund];
+    });
+    setQuery("");
+    setResults([]);
+  };
+  const remove=(schemeCode:number)=>setSelected(current=>current.filter(fund=>fund.scheme_code!==schemeCode));
+
+  const metrics:[string,(fund:ComparableFund)=>string][]=[
+    ["Scheme name",fund=>fund.scheme_name],
+    ["AMC",fund=>fund.amc_name??"Not supplied"],
+    ["Category",fund=>fund.category??"Unclassified"],
+    ["Subcategory",fund=>fund.subcategory??"Not supplied"],
+    ["Plan / option",fund=>(fund.plan??"Direct")+" · "+(fund.option??"Growth")],
+    ["Latest NAV",fund=>"₹"+Number(fund.nav).toLocaleString("en-IN",{maximumFractionDigits:4})],
+    ["NAV date",fund=>fund.nav_date],
+    ["Scheme code",fund=>String(fund.scheme_code)],
+    ["ISIN Growth",fund=>fund.isin_growth]
+  ];
+
+  return <main className="page-shell">
+    <PageIntro eyebrow="SIDE-BY-SIDE RESEARCH" title="Compare with context, not rankings."
+      description="Compare scheme facts that are available and comparable. This view explains differences; it does not declare a universal winner."/>
+    <SchemePicker query={query} selected={selected} results={results} busy={busy} error={error}
+      onQueryChange={setQuery} onAdd={add} onRemove={remove}/>
+    {selected.length>0&&<>
+      <div className="results-head"><h2>Available scheme information</h2><Pill>{selected.length} selected</Pill></div>
+      <div className="compare-table-wrap">
+        <table className="compare-table">
+          <thead><tr><th>INFORMATION</th>{selected.map(fund=><th key={fund.scheme_code}>{fund.scheme_name}</th>)}</tr></thead>
+          <tbody>{metrics.map(([label,get])=><tr key={label}><td>{label}</td>{selected.map(fund=><td key={fund.scheme_code}>{get(fund)}</td>)}</tr>)}</tbody>
+        </table>
+      </div>
+    </>}
+    <div style={{marginTop:24}}><Note title="Metrics not yet in the data source">
+      <p>Expense ratio, AUM, benchmark, Riskometer, portfolio holdings and historical returns are not supplied by the current AMFI NAV API. They should remain unavailable until separately verified, dated sources are integrated.</p>
+    </Note></div>
+    <p className="small-muted" style={{marginTop:18}}>Need to browse first? <Link className="text-link" href="/funds">Open the fund explorer →</Link></p>
+  </main>;
+}
