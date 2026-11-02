@@ -1,6 +1,7 @@
 # Easyfolio market-data provider and ingestion architecture
 
 **Status:** Research baseline — implementation gated on provider agreements and approved display rights  
+**Product model:** Free educational platform; advertising may be introduced in future. 
 **Date:** 2026-11-03  
 **Branch:** `research/market-data-provider-architecture`
 
@@ -134,7 +135,7 @@ Suggested tables:
 ## 9. Decisions still requiring the project owner
 
 No provider credentials or legal rights have been assumed. Before a live feed is enabled, the owner must approve:
-- Whether Easyfolio is strictly non-monetized education or has subscriptions/ads/other monetary incentives.
+- Business model: free educational access, with advertising as a possible future revenue stream. Provider approval must explicitly cover public display on an ad-supported website; do not assume a free-to-user service is non-commercial. Reassess provider terms before enabling ads if the contract distinguishes monetized from non-monetized display.
 - The intended benchmark definition for gold and silver (IBJA spot benchmark vs MCX contract settlement).
 - A provider budget and managed database budget.
 - The relevant provider agreements and public display permissions.
