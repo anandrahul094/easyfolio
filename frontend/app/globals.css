@@ -368,3 +368,39 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{ou
 .market-disclaimer{font-size:10px;line-height:1.7;color:#7683a4;margin:18px 0 0}
 @media(max-width:900px){.market-page{padding:28px 20px 100px}.market-hero{grid-template-columns:1fr}.market-hero-copy{padding:5px 0}.market-assets-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.market-lower-grid{grid-template-columns:1fr}}
 @media(max-width:560px){.market-page{padding:24px 16px 100px}.market-hero h1{font-size:39px;letter-spacing:-1.3px}.market-hero-copy>p{font-size:14px}.market-section-heading{align-items:flex-start;flex-direction:column}.market-assets-grid{grid-template-columns:1fr}.market-asset-card>p{min-height:0}.market-next-step{align-items:flex-start;flex-direction:column;padding:20px}.market-policy-card,.market-panel{padding:18px}.market-source-row{align-items:flex-start;flex-direction:column;gap:4px}.market-source-row strong{text-align:left}}
+
+
+/* Zero-cost market education and scenario lab */
+.market-status-education{color:#9de7c8;border-color:rgba(90,220,170,.18);background:rgba(90,220,170,.06)}
+.market-status-education i{background:#69d9ae;box-shadow:0 0 0 4px rgba(105,217,174,.1)}
+.market-learning-card{display:flex;flex-direction:column}
+.market-driver-block{margin-top:16px;padding:13px 13px 10px;border-radius:12px;background:rgba(255,255,255,.025);border:1px solid rgba(205,211,255,.09)}
+.market-driver-block>strong{font-size:10px;letter-spacing:.5px;text-transform:uppercase;color:#c6c0ed}
+.market-driver-block ul{padding-left:16px;margin:9px 0 0;display:grid;gap:7px}
+.market-driver-block li{font-size:11px;line-height:1.45;color:#aab5d1}
+.market-question{display:flex;align-items:flex-start;gap:8px;margin-top:12px;padding:10px 11px;border-radius:10px;background:rgba(122,205,190,.055);color:#9de3cf;font-size:11px;line-height:1.5}
+.market-question svg{flex:0 0 auto;margin-top:1px}
+.market-learning-card .market-asset-footer{margin-top:auto;padding-top:14px}
+.scenario-controls{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.scenario-field{display:grid;gap:7px;min-width:0}
+.scenario-field>span,.scenario-slider-label{font-size:11px;font-weight:700;color:#aeb9d6}
+.scenario-field input,.scenario-field select{width:100%;min-width:0;padding:11px 12px;border:1px solid rgba(205,211,255,.15);border-radius:10px;background:#171f40;color:#f5f5ff;font:500 12px inherit;outline:none}
+.scenario-field input:focus,.scenario-field select:focus{border-color:#a99aff;box-shadow:0 0 0 3px rgba(169,154,255,.12)}
+.scenario-result{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;margin-top:18px;padding:16px;border:1px solid rgba(205,211,255,.12);border-radius:13px;background:rgba(255,255,255,.025)}
+.scenario-result>div:not(.scenario-result-arrow){display:grid;gap:6px}
+.scenario-result span{font-size:10px;color:#929fbe}
+.scenario-result strong{font:600 clamp(20px,3vw,28px) "Space Grotesk",sans-serif;color:#fff;overflow-wrap:anywhere}
+.scenario-result .scenario-positive{color:#79dfb7}.scenario-result .scenario-negative{color:#ff9a9a}
+.scenario-result-arrow{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:rgba(154,137,255,.13);color:#c7baff}
+.scenario-slider-label{display:flex;justify-content:space-between;margin-top:19px}
+.scenario-slider-label span:last-child{font-size:12px;color:#d1c8ff}
+.scenario-slider{width:100%;margin:13px 0 0;accent-color:#a99aff;cursor:pointer}
+.scenario-slider-ends{display:flex;justify-content:space-between;font-size:9px;color:#7f8baa;margin-top:3px}
+.scenario-explainer{font-size:11px;line-height:1.65;color:#c1c9df;margin:15px 0 0}
+.scenario-disclaimer{font-size:10px;line-height:1.6;color:#8793b2;margin:8px 0 0}
+.market-insight-row{display:flex;gap:11px;padding:13px 0;border-bottom:1px solid rgba(205,211,255,.08);color:#a99aff}
+.market-insight-row>svg{flex:0 0 auto;margin-top:2px}
+.market-insight-row strong{font-size:11px;color:#e5e8f7}
+.market-insight-row p{font-size:10px;line-height:1.65;color:#99a5c4;margin:5px 0 0}
+.market-inline-link{display:inline-flex;align-items:center;gap:5px;margin-top:17px;color:#c6baff;font-size:11px;font-weight:800}
+@media(max-width:560px){.scenario-controls{grid-template-columns:1fr}.scenario-result{padding:12px;gap:7px}.scenario-result strong{font-size:21px}.market-driver-block li{font-size:12px}}
