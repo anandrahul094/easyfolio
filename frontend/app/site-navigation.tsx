@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import {usePathname} from "next/navigation";
-import {BookOpen,Calculator,Compass,Home,Layers} from "lucide-react";
+import {Activity,BookOpen,Calculator,Compass,Home,Layers} from "lucide-react";
 
 const links=[
   ["/learn","Learn"],["/basics","Foundations"],["/categories","Categories"],
-  ["/funds","Explore"],["/compare","Compare"],["/calculators/sip","Calculators"],["/glossary","Glossary"]
+  ["/funds","Explore"],["/market","Markets"],["/compare","Compare"],["/calculators/sip","Calculators"],["/glossary","Glossary"]
 ] as const;
 function isActive(pathname:string,href:string){
   if(href==="/")return pathname==="/";
@@ -23,6 +23,6 @@ export function SiteHeader(){
 }
 export function MobileBottomNav(){
   const pathname=usePathname();
-  const quick=[["/","Home",Home],["/learn","Learn",BookOpen],["/funds","Explore",Layers],["/calculators/sip","Tools",Calculator]] as const;
+  const quick=[["/","Home",Home],["/learn","Learn",BookOpen],["/market","Markets",Activity],["/funds","Explore",Layers]] as const;
   return <nav className="mobile-bottom-nav" aria-label="Quick navigation">{quick.map(([href,label,Icon])=><Link key={href} href={href} aria-current={isActive(pathname,href)?"page":undefined}><span><Icon size={17}/></span>{label}</Link>)}</nav>;
 }
