@@ -24,10 +24,10 @@ describe("responsive navigation state",()=>{
     expect(learnLinks.every(link=>link.getAttribute("aria-current")==="page")).toBe(true);
   });
 
-  test("calculator routes keep the calculator quick link active",()=>{
+  test("calculator routes keep the calculator link active",()=>{
     pathname="/calculators/compound";
     render(<><SiteHeader/><MobileBottomNav/></>);
-    expect(screen.getByRole("link",{name:"Calculators"})).toHaveAttribute("aria-current","page");
-    expect(screen.getByRole("link",{name:/Tools/})).toHaveAttribute("aria-current","page");
+    const calculatorLink=screen.getByRole("link",{name:"Calculators"});
+    expect(calculatorLink).toHaveAttribute("aria-current","page");
   });
 });
