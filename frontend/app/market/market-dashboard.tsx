@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import {useMemo,useState} from "react";
-import {Activity,ArrowUpRight,BookOpen,ChartNoAxesCombined,Compass,Globe2,Lightbulb,Scale,ShieldCheck,TrendingUp,Wallet} from "lucide-react";
+import {Activity,ArrowUpRight,BookOpen,ChartNoAxesCombined,Compass,Globe2,Info,Lightbulb,Scale,ShieldCheck,TrendingUp,Wallet} from "lucide-react";
 
 const assets=[
   {id:"nifty-50",name:"NIFTY 50",kind:"Broad-market benchmark",symbol:"N",colour:"violet",summary:"A benchmark designed to represent the performance of 50 large, liquid companies listed on NSE.",drivers:["Company earnings and valuations","Interest rates and inflation","Domestic and global investor flows"],learn:"Understand how a diversified basket can represent a broad market without representing every listed company.",question:"Why can an index rise even when some of its companies fall?",lesson:"/learn"},
